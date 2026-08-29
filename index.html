@@ -7,400 +7,139 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
-/* ===== Tokens ===== */
 :root {
   --ink: #1c2541;
   --ink-soft: #2e3a5c;
   --paper: #f7f5ef;
   --paper-line: #e2ddd0;
   --gold: #b9863f;
+  --gold-soft: #f2e6d0;
   --income: #2f6b4f;
+  --income-soft: #e3f0e8;
   --expense: #a6432e;
+  --expense-soft: #f6e6e2;
   --muted: #6b6a63;
   --white: #ffffff;
-
   --font-display: 'Spectral', Georgia, serif;
   --font-body: 'Inter', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
 }
 
 * { box-sizing: border-box; }
-
-html, body {
-  margin: 0;
-  padding: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-body);
-  -webkit-font-smoothing: antialiased;
-}
-
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
 .hidden { display: none !important; }
-
 button { font-family: var(--font-body); cursor: pointer; }
 input, select { font-family: var(--font-body); }
 
-/* ===== Login screen ===== */
-#login-screen {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-}
-
-.login-card {
-  width: 100%;
-  max-width: 360px;
-  background: var(--white);
-  border: 1px solid var(--paper-line);
-  border-radius: 8px;
-  padding: 2.25rem 1.75rem;
-  box-shadow: 0 1px 3px rgba(28, 37, 65, 0.08);
-}
-
-.login-mark {
-  font-family: var(--font-display);
-  font-size: 1.9rem;
-  font-weight: 600;
-  color: var(--ink);
-  margin: 0;
-  text-align: center;
-}
-
+/* ===== Login ===== */
+#login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+.login-card { width: 100%; max-width: 360px; background: var(--white); border: 1px solid var(--paper-line); border-radius: 8px; padding: 2.25rem 1.75rem; box-shadow: 0 1px 3px rgba(28,37,65,.08); }
+.login-mark { font-family: var(--font-display); font-size: 1.9rem; font-weight: 600; margin: 0; text-align: center; }
 .login-mark span { border-bottom: 3px solid var(--gold); padding-bottom: 2px; }
-
-.login-sub {
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.85rem;
-  margin: 0.35rem 0 1.75rem;
-}
-
+.login-sub { text-align: center; color: var(--muted); font-size: .85rem; margin: .35rem 0 1.75rem; }
 .field { margin-bottom: 1rem; }
-
-.field label {
-  display: block;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-  margin-bottom: 0.35rem;
-}
-
-.field input {
-  width: 100%;
-  padding: 0.65rem 0.75rem;
-  border: 1px solid var(--paper-line);
-  border-radius: 6px;
-  font-size: 0.95rem;
-  background: var(--paper);
-  color: var(--ink);
-}
-
-.field input:focus {
-  outline: 2px solid var(--gold);
-  outline-offset: 1px;
-  background: var(--white);
-}
-
-.btn-primary {
-  width: 100%;
-  padding: 0.75rem;
-  background: var(--ink);
-  color: var(--white);
-  border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  margin-top: 0.4rem;
-}
-
+.field input { width: 100%; padding: .65rem .75rem; border: 1px solid var(--paper-line); border-radius: 6px; font-size: .95rem; background: var(--paper); color: var(--ink); }
+.field input:focus { outline: 2px solid var(--gold); outline-offset: 1px; background: var(--white); }
+.btn-primary { width: 100%; padding: .75rem; background: var(--ink); color: var(--white); border: none; border-radius: 6px; font-size: .9rem; font-weight: 600; }
 .btn-primary:hover { background: var(--ink-soft); }
-.btn-primary:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.auth-error { color: var(--expense); font-size: .82rem; text-align: center; min-height: 1.2em; margin-top: .6rem; }
+.pin-input { width: 100%; padding: .75rem; border: 1px solid var(--paper-line); border-radius: 6px; background: var(--paper); color: var(--ink); font-size: 1.8rem; letter-spacing: .6em; text-align: center; font-family: var(--font-mono); }
+.pin-input:focus { outline: 2px solid var(--gold); outline-offset: 1px; background: var(--white); }
+.pin-hint { text-align: center; color: var(--muted); font-size: .76rem; margin-top: 1.1rem; line-height: 1.4; }
 
-.auth-error {
-  color: var(--expense);
-  font-size: 0.82rem;
-  text-align: center;
-  min-height: 1.2em;
-  margin-top: 0.6rem;
-}
-
-.pin-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--paper-line);
-  border-radius: 6px;
-  background: var(--paper);
-  color: var(--ink);
-  font-size: 1.8rem;
-  letter-spacing: 0.6em;
-  text-align: center;
-  font-family: var(--font-mono);
-}
-
-.pin-input:focus {
-  outline: 2px solid var(--gold);
-  outline-offset: 1px;
-  background: var(--white);
-}
-
-.pin-hint {
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.76rem;
-  margin-top: 1.1rem;
-  line-height: 1.4;
-}
-
-/* ===== App shell / top nav ===== */
-#app-screen {
-  max-width: 920px;
-  margin: 0 auto;
-}
-
-.topbar {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--paper-line);
-  background: var(--white);
-  flex-wrap: wrap;
-}
-
-.topbar .brand {
-  font-family: var(--font-display);
-  font-size: 1.2rem;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
+/* ===== App shell ===== */
+#app-screen { max-width: 1100px; margin: 0 auto; }
+.topbar { display: flex; align-items: center; gap: 1.5rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--paper-line); background: var(--white); flex-wrap: wrap; position: sticky; top: 0; z-index: 10; }
+.topbar .brand { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; flex-shrink: 0; }
 .topbar .brand span { border-bottom: 2px solid var(--gold); }
-
-.tabs {
-  display: flex;
-  gap: 0.4rem;
-  flex: 1;
-  overflow-x: auto;
-}
-
-.tab-btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  background: transparent;
-  border-radius: 6px;
-  font-size: 0.87rem;
-  font-weight: 600;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
+.tabs { display: flex; gap: .4rem; flex: 1; overflow-x: auto; }
+.tab-btn { padding: .5rem 1rem; border: none; background: transparent; border-radius: 6px; font-size: .87rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
 .tab-btn:hover { background: var(--paper); color: var(--ink); }
-
-.tab-btn.active {
-  background: var(--ink);
-  color: var(--white);
-}
-
-#logout-btn {
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 0.78rem;
-  text-decoration: underline;
-  flex-shrink: 0;
-}
-
-/* ===== Months strip (monthly summary cards) ===== */
-.months-strip {
-  display: flex;
-  gap: 0.75rem;
-  overflow-x: auto;
-  padding: 1rem 1.25rem;
-}
-
-.month-card {
-  flex: 0 0 auto;
-  min-width: 148px;
-  background: var(--white);
-  border: 1px solid var(--paper-line);
-  border-radius: 8px;
-  padding: 0.85rem 0.95rem;
-}
-
-.month-card.current { border-color: var(--gold); border-width: 2px; }
-
-.month-card .m-label {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 0.85rem;
-  text-transform: capitalize;
-  margin: 0 0 0.5rem;
-  color: var(--ink);
-}
-
-.month-card .m-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.74rem;
-  color: var(--muted);
-  margin-bottom: 0.15rem;
-}
-
-.month-card .m-row b {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 0.76rem;
-}
-
-.month-card .m-row.income b { color: var(--income); }
-.month-card .m-row.expense b { color: var(--expense); }
-
-.month-card .m-result {
-  margin-top: 0.5rem;
-  padding-top: 0.45rem;
-  border-top: 1px solid var(--paper-line);
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-
-.month-card .m-result span { font-size: 0.72rem; color: var(--muted); }
-
-.month-card .m-result b {
-  font-family: var(--font-mono);
-  font-size: 1rem;
-}
-
-.month-card .m-result b.positive { color: var(--income); }
-.month-card .m-result b.negative { color: var(--expense); }
-
-/* ===== Tab panels ===== */
-.tab-panels { padding: 0.5rem 1.25rem 4rem; }
+.tab-btn.active { background: var(--ink); color: var(--white); }
+#logout-btn { background: none; border: none; color: var(--muted); font-size: .78rem; text-decoration: underline; flex-shrink: 0; }
+.tab-panels { padding: 1rem 1.1rem 4rem; }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
 
-/* ===== Add card / forms ===== */
-.add-card {
-  background: var(--white);
-  border: 1px solid var(--paper-line);
-  border-radius: 8px;
-  padding: 1.1rem;
-  margin: 1rem 0 1.5rem;
-}
+/* ===== Mini forms (add tarjeta / empresa / categoria) ===== */
+.mini-form-bar { margin-bottom: 1rem; }
+.mini-form { display: flex; gap: .5rem; flex-wrap: wrap; }
+.mini-form input { flex: 1; min-width: 180px; padding: .55rem .7rem; border: 1px solid var(--paper-line); border-radius: 6px; font-size: .88rem; background: var(--white); color: var(--ink); }
+.mini-form input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+.btn-secondary { padding: .55rem 1rem; background: var(--white); border: 1px solid var(--ink); color: var(--ink); border-radius: 6px; font-size: .83rem; font-weight: 600; white-space: nowrap; }
+.btn-secondary:hover { background: var(--ink); color: var(--white); }
 
-.add-card h2 {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  margin: 0 0 0.9rem;
-}
+/* ===== Card blocks (tarjeta / empresa groups) ===== */
+.group-block { background: var(--white); border: 1px solid var(--paper-line); border-radius: 8px; margin-bottom: 1.25rem; overflow: hidden; }
+.group-header { display: flex; align-items: center; justify-content: space-between; padding: .8rem 1rem; background: var(--ink); color: var(--white); }
+.group-header h3 { font-family: var(--font-display); font-size: 1.02rem; margin: 0; }
+.group-delete { background: none; border: none; color: #a9b0c9; font-size: .78rem; text-decoration: underline; }
+.group-delete:hover { color: var(--white); }
+.group-body { padding: .9rem 1rem; }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.7rem;
-  margin-bottom: 0.7rem;
-}
+.sub-form { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .9rem; align-items: flex-end; }
+.sub-form .sf-field { display: flex; flex-direction: column; gap: .25rem; }
+.sub-form .sf-field label { font-size: .66rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.sub-form input, .sub-form select { padding: .5rem .6rem; border: 1px solid var(--paper-line); border-radius: 6px; font-size: .85rem; background: var(--paper); color: var(--ink); }
+.sub-form .sf-desc { flex: 1; min-width: 140px; }
+.sub-form .sf-num { width: 100px; }
+.sub-form .sf-month { width: 130px; }
+.sub-form button { padding: .5rem 1rem; background: var(--gold); border: none; color: var(--white); border-radius: 6px; font-size: .82rem; font-weight: 600; }
 
-.form-grid .full { grid-column: 1 / -1; }
+/* ===== Matrix tables ===== */
+.matrix-wrap { overflow-x: auto; margin-bottom: .5rem; border: 1px solid var(--paper-line); border-radius: 8px; }
+.matrix-table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: .82rem; }
+.matrix-table th, .matrix-table td { padding: .5rem .65rem; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--paper-line); }
+.matrix-table th:first-child, .matrix-table td:first-child { text-align: left; position: sticky; left: 0; background: inherit; min-width: 160px; }
+.matrix-table thead th { background: var(--ink); color: var(--white); font-weight: 600; text-transform: capitalize; font-size: .78rem; }
+.matrix-table thead th:first-child { background: var(--ink); }
+.matrix-table tbody tr:nth-child(even) { background: var(--paper); }
+.matrix-table tbody tr:nth-child(odd) { background: var(--white); }
+.matrix-table td.row-label { font-weight: 600; }
+.matrix-table td.amount { font-family: var(--font-mono); }
+.matrix-table tr.total-row td { font-weight: 700; background: var(--gold-soft) !important; border-top: 2px solid var(--gold); }
+.matrix-table tr.total-row td.row-label { color: var(--ink); }
+.matrix-table tr.saldo-row td { font-weight: 700; font-size: .9rem; }
+.matrix-table tr.saldo-row td.amount.positive { color: var(--income); background: var(--income-soft) !important; }
+.matrix-table tr.saldo-row td.amount.negative { color: var(--expense); background: var(--expense-soft) !important; }
+.matrix-table tr.section-row td { background: var(--ink-soft) !important; color: var(--white); font-weight: 600; font-size: .76rem; text-transform: uppercase; letter-spacing: .04em; }
+.matrix-table td.muted { color: var(--muted); }
+.matrix-table td.row-delete { text-align: center; width: 32px; }
+.matrix-table td.row-delete button { background: none; border: none; color: var(--paper-line); font-size: 1rem; }
+.matrix-table td.row-delete button:hover { color: var(--expense); }
 
-.form-grid label {
-  display: block;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--muted);
-  margin-bottom: 0.3rem;
-}
-
-.form-grid input, .form-grid select {
-  width: 100%;
-  padding: 0.55rem 0.6rem;
-  border: 1px solid var(--paper-line);
-  border-radius: 6px;
-  font-size: 0.9rem;
-  background: var(--paper);
-  color: var(--ink);
-}
-
-.add-card .btn-primary { margin-top: 0.3rem; }
-
-/* ===== Ledger list ===== */
-.ledger-heading {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  margin: 0 0 0.6rem;
-}
-
-.ledger { border-top: 1px solid var(--paper-line); }
-
-.tx-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 0.1rem;
-  border-bottom: 1px solid var(--paper-line);
-  gap: 0.5rem;
-}
-
-.tx-info { min-width: 0; }
-
-.tx-cat {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.tx-meta {
-  font-size: 0.76rem;
-  color: var(--muted);
-  margin-top: 0.15rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tx-right {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  flex-shrink: 0;
-}
-
-.tx-amount {
+.matrix-table td.editable-cell { padding: .3rem .4rem; }
+.tarjeta-pago-input {
+  width: 90px;
+  text-align: right;
   font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 0.95rem;
-  white-space: nowrap;
+  font-size: .82rem;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink);
+  padding: .3rem .35rem;
+  border-radius: 4px;
 }
+.tarjeta-pago-input:hover { border-color: var(--paper-line); }
+.tarjeta-pago-input:focus { outline: none; border-color: var(--gold); background: var(--white); }
+.tarjeta-pago-input.edited { color: var(--gold); font-weight: 700; border-bottom: 1px dashed var(--gold); }
 
-.tx-amount.income { color: var(--income); }
-.tx-amount.expense { color: var(--expense); }
+.grand-total-wrap { margin-top: .5rem; }
 
-.tx-delete {
-  background: none;
-  border: none;
-  color: var(--paper-line);
-  font-size: 1.1rem;
-  line-height: 1;
-  padding: 0.2rem;
-}
+.section-divider { font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin: 1.75rem 0 .75rem; padding-bottom: .4rem; border-bottom: 2px solid var(--gold); }
 
-.tx-delete:hover { color: var(--expense); }
+/* ===== Generic add-card form (used in Gastos) ===== */
+.add-card { background: var(--white); border: 1px solid var(--paper-line); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+.form-grid .full { grid-column: 1 / -1; }
+.form-grid label { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: .3rem; }
+.form-grid input, .form-grid select { width: 100%; padding: .55rem .6rem; border: 1px solid var(--paper-line); border-radius: 6px; font-size: .9rem; background: var(--paper); color: var(--ink); }
 
-.empty-state {
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.85rem;
-  padding: 2.5rem 1rem;
-}
+.empty-state { text-align: center; color: var(--muted); font-size: .85rem; padding: 1.5rem 1rem; }
 
 @media (max-width: 480px) {
   .form-grid { grid-template-columns: 1fr; }
-  .topbar { padding: 0.85rem 1rem; }
+  .topbar { padding: .85rem 1rem; }
 }
 
 </style>
@@ -412,25 +151,13 @@ input, select { font-family: var(--font-body); }
   <div class="login-card">
     <p class="login-mark"><span>Libro</span></p>
     <p class="login-sub">Ingresá tu PIN de 4 dígitos</p>
-
     <form id="auth-form">
       <div class="field">
-        <input
-          type="password"
-          inputmode="numeric"
-          pattern="[0-9]*"
-          id="pin"
-          class="pin-input"
-          maxlength="4"
-          required
-          autocomplete="off"
-          placeholder="••••"
-        />
+        <input type="password" inputmode="numeric" pattern="[0-9]*" id="pin" class="pin-input" maxlength="4" required autocomplete="off" placeholder="••••" />
       </div>
       <button type="submit" class="btn-primary" id="auth-submit">Entrar</button>
       <p class="auth-error" id="auth-error"></p>
     </form>
-
     <p class="pin-hint">La primera vez que uses un PIN, queda creado. Usá siempre el mismo PIN en todos tus dispositivos para ver los mismos datos.</p>
   </div>
 </div>
@@ -448,104 +175,96 @@ input, select { font-family: var(--font-body); }
     <button id="logout-btn">Cambiar PIN</button>
   </header>
 
-  <!-- Resumen mensual (visible en las 3 pestañas) -->
-  <section class="months-strip" id="months-strip"></section>
-
   <main class="tab-panels">
 
-    <!-- TARJETAS -->
+    <!-- ===================== TARJETAS ===================== -->
     <section class="tab-panel active" id="panel-tarjetas">
-      <div class="add-card">
-        <h2>Nueva compra / cuota</h2>
-        <form id="card-form">
-          <div class="form-grid">
-            <div class="full">
-              <label for="card-desc">Descripción</label>
-              <input type="text" id="card-desc" placeholder="Ej: Heladera" required />
-            </div>
-            <div>
-              <label for="card-total">Monto total</label>
-              <input type="number" id="card-total" step="0.01" min="0" required placeholder="0.00" />
-            </div>
-            <div>
-              <label for="card-installments">Cantidad de cuotas</label>
-              <input type="number" id="card-installments" min="1" step="1" required placeholder="1" />
-            </div>
-            <div class="full">
-              <label for="card-first-month">Mes de la primera cuota</label>
-              <input type="month" id="card-first-month" required />
-            </div>
-          </div>
-          <button type="submit" class="btn-primary">Agregar compra</button>
+
+      <div class="mini-form-bar">
+        <form id="tarjeta-form" class="mini-form">
+          <input type="text" id="tarjeta-nombre" placeholder="Nombre de la tarjeta (ej: BBVA Master)" required />
+          <button type="submit" class="btn-secondary">+ Nueva tarjeta</button>
         </form>
       </div>
 
-      <h3 class="ledger-heading">Compras cargadas</h3>
-      <div class="ledger" id="cards-list">
-        <div class="empty-state">Todavía no cargaste ninguna compra.</div>
-      </div>
+      <div id="tarjetas-container"></div>
+
+      <div class="grand-total-wrap" id="tarjetas-grand-total"></div>
     </section>
 
-    <!-- SUELDO -->
+    <!-- ===================== SUELDO ===================== -->
     <section class="tab-panel" id="panel-sueldo">
-      <div class="add-card">
-        <h2>Nuevo sueldo</h2>
-        <form id="salary-form">
-          <div class="form-grid">
-            <div>
-              <label for="salary-amount">Monto</label>
-              <input type="number" id="salary-amount" step="0.01" min="0" required placeholder="0.00" />
-            </div>
-            <div>
-              <label for="salary-month">Mes</label>
-              <input type="month" id="salary-month" required />
-            </div>
-            <div class="full">
-              <label for="salary-note">Nota (opcional)</label>
-              <input type="text" id="salary-note" placeholder="Ej: Sueldo en blanco" />
-            </div>
-          </div>
-          <button type="submit" class="btn-primary">Agregar sueldo</button>
+
+      <div class="mini-form-bar">
+        <form id="empresa-form" class="mini-form">
+          <input type="text" id="empresa-nombre" placeholder="Nombre de la empresa" required />
+          <button type="submit" class="btn-secondary">+ Nueva empresa</button>
         </form>
       </div>
 
-      <h3 class="ledger-heading">Sueldos cargados</h3>
-      <div class="ledger" id="salary-list">
-        <div class="empty-state">Todavía no cargaste ningún sueldo.</div>
-      </div>
+      <div id="empresas-container"></div>
+
+      <div class="grand-total-wrap" id="sueldo-grand-total"></div>
     </section>
 
-    <!-- GASTOS -->
+    <!-- ===================== GASTOS ===================== -->
     <section class="tab-panel" id="panel-gastos">
+
+      <div class="matrix-wrap">
+        <table class="matrix-table" id="resumen-table"></table>
+      </div>
+
+      <div class="section-divider">Ingresos extra</div>
       <div class="add-card">
-        <h2>Nuevo gasto</h2>
-        <form id="expense-form">
-          <div class="form-grid">
-            <div>
-              <label for="expense-amount">Monto</label>
-              <input type="number" id="expense-amount" step="0.01" min="0" required placeholder="0.00" />
-            </div>
-            <div>
-              <label for="expense-date">Fecha</label>
-              <input type="date" id="expense-date" required />
-            </div>
-            <div>
-              <label for="expense-category">Categoría</label>
-              <select id="expense-category"></select>
-            </div>
-            <div>
-              <label for="expense-note">Nota (opcional)</label>
-              <input type="text" id="expense-note" placeholder="Detalle" />
-            </div>
+        <form id="otro-ingreso-form" class="form-grid">
+          <div>
+            <label for="oi-monto">Monto</label>
+            <input type="number" id="oi-monto" step="0.01" min="0" required placeholder="0.00" />
           </div>
-          <button type="submit" class="btn-primary">Agregar gasto</button>
+          <div>
+            <label for="oi-mes">Mes</label>
+            <input type="month" id="oi-mes" required />
+          </div>
+          <div class="full">
+            <label for="oi-nota">Nota (opcional)</label>
+            <input type="text" id="oi-nota" placeholder="Ej: Aguinaldo, venta" />
+          </div>
+          <button type="submit" class="btn-primary full">Agregar ingreso extra</button>
         </form>
       </div>
 
-      <h3 class="ledger-heading">Gastos cargados</h3>
-      <div class="ledger" id="expenses-list">
-        <div class="empty-state">Todavía no cargaste ningún gasto.</div>
+      <div class="section-divider">Categorías de gasto</div>
+      <div class="mini-form-bar">
+        <form id="categoria-form" class="mini-form">
+          <input type="text" id="categoria-nombre" placeholder="Nombre de categoría (ej: Alquiler)" required />
+          <button type="submit" class="btn-secondary">+ Nueva categoría</button>
+        </form>
       </div>
+
+      <div class="add-card">
+        <form id="gasto-form" class="form-grid">
+          <div>
+            <label for="gasto-categoria">Categoría</label>
+            <select id="gasto-categoria" required></select>
+          </div>
+          <div>
+            <label for="gasto-monto">Monto</label>
+            <input type="number" id="gasto-monto" step="0.01" min="0" required placeholder="0.00" />
+          </div>
+          <div>
+            <label for="gasto-mes">Mes</label>
+            <input type="month" id="gasto-mes" required />
+          </div>
+          <div>
+            <label for="gasto-nota">Nota (opcional)</label>
+            <input type="text" id="gasto-nota" placeholder="Detalle" />
+          </div>
+          <button type="submit" class="btn-primary full">Agregar gasto</button>
+        </form>
+      </div>
+
+      <div id="categorias-list"></div>
+
     </section>
 
   </main>
@@ -561,11 +280,9 @@ const firebaseConfig = {
   appId: "1:115924821342:web:8a29337129458cedce5bcf"
 };
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  getAuth, onAuthStateChanged, signInAnonymously
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {
-  getFirestore, collection, addDoc, deleteDoc, doc,
+  getFirestore, collection, addDoc, deleteDoc, doc, setDoc,
   onSnapshot, query, orderBy, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -575,13 +292,48 @@ const db = getFirestore(app);
 
 const PIN_STORAGE_KEY = "libro-pin";
 let currentPin = null;
-
-const EXPENSE_CATEGORIES = ["Comida", "Transporte", "Vivienda", "Servicios", "Salud", "Ocio", "Otro"];
-
-let cards = [];      // compras con cuotas
-let salaries = [];   // sueldos
-let expenses = [];   // gastos sueltos
 let unsubs = [];
+
+// ---- Data ----
+let tarjetas = [];      // {id, nombre}
+let compras = [];       // {id, tarjetaId, fecha, detalle, montoTotal, cuotas, mesPrimeraCuota}
+let comisiones = [];    // {id, tarjetaId, month, monto}
+let empresas = [];      // {id, nombre}
+let sueldos = [];       // {id, empresaId, mesPago, bruto, neto, ninera, comedor, pagoHaberes}
+let categorias = [];    // {id, nombre}
+let gastos = [];        // {id, categoriaId, month, monto, nota}
+let otrosIngresos = []; // {id, month, monto, nota}
+let pagosTarjeta = [];  // {id, tarjetaId, month, monto} — override manual del pago real de tarjeta
+
+/* ---------- Helpers ---------- */
+function money(n) {
+  n = n || 0;
+  return "$" + n.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+function currentMonthKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+function addMonths(monthKey, n) {
+  const [y, m] = monthKey.split("-").map(Number);
+  const d = new Date(y, m - 1 + n, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+function formatMonthShort(monthKey) {
+  const [y, m] = monthKey.split("-").map(Number);
+  const d = new Date(y, m - 1, 1);
+  return d.toLocaleDateString("es-ES", { month: "short", year: "2-digit" }).replace(".", "");
+}
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str || "";
+  return div.innerHTML;
+}
+const MONTH_OFFSETS = [-1, 0, 1, 2, 3, 4, 5];
+function monthRange() {
+  const cur = currentMonthKey();
+  return MONTH_OFFSETS.map((o) => addMonths(cur, o));
+}
 
 /* ---------- Auth (PIN) ---------- */
 const loginScreen = document.getElementById("login-screen");
@@ -594,12 +346,7 @@ authForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   authError.textContent = "";
   const pin = pinInput.value.trim();
-
-  if (!/^\d{4}$/.test(pin)) {
-    authError.textContent = "El PIN debe tener 4 números.";
-    return;
-  }
-
+  if (!/^\d{4}$/.test(pin)) { authError.textContent = "El PIN debe tener 4 números."; return; }
   try {
     if (!auth.currentUser) await signInAnonymously(auth);
     enterApp(pin);
@@ -608,12 +355,19 @@ authForm.addEventListener("submit", async (e) => {
   }
 });
 
+// Asegura que Enter dispare el envío del formulario en cualquier navegador/teclado móvil
+pinInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    authForm.requestSubmit();
+  }
+});
+
 document.getElementById("logout-btn").addEventListener("click", () => {
   localStorage.removeItem(PIN_STORAGE_KEY);
   currentPin = null;
-  unsubs.forEach((u) => u());
-  unsubs = [];
-  cards = []; salaries = []; expenses = [];
+  unsubs.forEach((u) => u()); unsubs = [];
+  tarjetas = []; compras = []; comisiones = []; empresas = []; sueldos = []; categorias = []; gastos = []; otrosIngresos = []; pagosTarjeta = [];
   appScreen.classList.add("hidden");
   loginScreen.classList.remove("hidden");
   pinInput.value = "";
@@ -646,250 +400,501 @@ document.getElementById("tabs").addEventListener("click", (e) => {
   document.getElementById("panel-" + btn.dataset.tab).classList.add("active");
 });
 
-/* ---------- Helpers ---------- */
-function money(n) {
-  return "$" + n.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+/* ---------- Firestore listeners ---------- */
+function col(name) { return collection(db, "pins", currentPin, name); }
+
+function startListening(pin) {
+  unsubs.forEach((u) => u()); unsubs = [];
+
+  unsubs.push(onSnapshot(query(col("tarjetas"), orderBy("nombre")), (s) => {
+    tarjetas = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
+  }));
+  unsubs.push(onSnapshot(query(col("compras"), orderBy("mesPrimeraCuota")), (s) => {
+    compras = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
+  }));
+  unsubs.push(onSnapshot(col("comisiones"), (s) => {
+    comisiones = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
+  }));
+  unsubs.push(onSnapshot(query(col("empresas"), orderBy("nombre")), (s) => {
+    empresas = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
+  }));
+  unsubs.push(onSnapshot(query(col("sueldos"), orderBy("mesPago")), (s) => {
+    sueldos = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
+  }));
+  unsubs.push(onSnapshot(query(col("categoriasGasto"), orderBy("nombre")), (s) => {
+    categorias = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
+  }));
+  unsubs.push(onSnapshot(col("gastos"), (s) => {
+    gastos = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
+  }));
+  unsubs.push(onSnapshot(col("otrosIngresos"), (s) => {
+    otrosIngresos = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
+  }));
+  unsubs.push(onSnapshot(col("pagosTarjeta"), (s) => {
+    pagosTarjeta = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
+  }));
 }
 
-function currentMonthKey() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+function renderAll() {
+  renderTarjetas();
+  renderSueldo();
+  renderGastos();
 }
 
-function addMonths(monthKey, n) {
-  const [y, m] = monthKey.split("-").map(Number);
-  const d = new Date(y, m - 1 + n, 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-}
+/* =========================================================
+   TARJETAS
+   ========================================================= */
+document.getElementById("tarjeta-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const nombre = document.getElementById("tarjeta-nombre").value.trim();
+  if (!nombre || !currentPin) return;
+  await addDoc(col("tarjetas"), { nombre, createdAt: serverTimestamp() });
+  e.target.reset();
+});
 
-function formatMonth(monthKey) {
-  const [y, m] = monthKey.split("-").map(Number);
-  const d = new Date(y, m - 1, 1);
-  return d.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
-}
-
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
-}
-
-/* Cuota mensual que corresponde a una tarjeta en un mes dado (0 si no aplica) */
-function cardAmountForMonth(card, monthKey) {
-  const cuota = card.totalAmount / card.installments;
-  for (let i = 0; i < card.installments; i++) {
-    if (addMonths(card.firstMonth, i) === monthKey) return cuota;
+function cuotaMontoForMonth(compra, monthKey) {
+  const cuota = compra.montoTotal / compra.cuotas;
+  for (let i = 0; i < compra.cuotas; i++) {
+    if (addMonths(compra.mesPrimeraCuota, i) === monthKey) return cuota;
   }
   return 0;
 }
 
-function salaryForMonth(monthKey) {
-  return salaries.filter((s) => s.month === monthKey).reduce((sum, s) => sum + s.amount, 0);
+function comisionForMonth(tarjetaId, monthKey) {
+  return comisiones
+    .filter((c) => c.tarjetaId === tarjetaId && c.month === monthKey)
+    .reduce((s, c) => s + c.monto, 0);
 }
 
-function cardsForMonth(monthKey) {
-  return cards.reduce((sum, c) => sum + cardAmountForMonth(c, monthKey), 0);
+function tarjetaTotalForMonth(tarjetaId, monthKey) {
+  const comprasCard = compras.filter((c) => c.tarjetaId === tarjetaId);
+  const cuotasTotal = comprasCard.reduce((s, c) => s + cuotaMontoForMonth(c, monthKey), 0);
+  return cuotasTotal + comisionForMonth(tarjetaId, monthKey);
 }
 
-function expensesForMonth(monthKey) {
-  return expenses.filter((e) => e.date.slice(0, 7) === monthKey).reduce((sum, e) => sum + e.amount, 0);
-}
+function renderTarjetas() {
+  const container = document.getElementById("tarjetas-container");
+  const months = monthRange();
 
-/* ---------- Firestore ---------- */
-function startListening(pin) {
-  unsubs.forEach((u) => u());
-  unsubs = [];
-
-  const qCards = query(collection(db, "pins", pin, "cards"), orderBy("firstMonth", "desc"));
-  unsubs.push(onSnapshot(qCards, (snap) => {
-    cards = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    renderCards();
-    renderMonthsStrip();
-  }));
-
-  const qSalaries = query(collection(db, "pins", pin, "salaries"), orderBy("month", "desc"));
-  unsubs.push(onSnapshot(qSalaries, (snap) => {
-    salaries = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    renderSalaries();
-    renderMonthsStrip();
-  }));
-
-  const qExpenses = query(collection(db, "pins", pin, "expenses"), orderBy("date", "desc"));
-  unsubs.push(onSnapshot(qExpenses, (snap) => {
-    expenses = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    renderExpenses();
-    renderMonthsStrip();
-  }));
-}
-
-/* ---------- Months strip ---------- */
-function renderMonthsStrip() {
-  const strip = document.getElementById("months-strip");
-  const cur = currentMonthKey();
-  const range = [-2, -1, 0, 1, 2, 3, 4];
-  strip.innerHTML = range
-    .map((offset) => {
-      const mk = addMonths(cur, offset);
-      const income = salaryForMonth(mk);
-      const expense = expensesForMonth(mk) + cardsForMonth(mk);
-      const result = income - expense;
-      return `
-        <div class="month-card ${mk === cur ? "current" : ""}">
-          <p class="m-label">${formatMonth(mk)}</p>
-          <div class="m-row income"><span>Ingresos</span><b>${money(income)}</b></div>
-          <div class="m-row expense"><span>Gastos</span><b>${money(expense)}</b></div>
-          <div class="m-result">
-            <span>Saldo</span>
-            <b class="${result >= 0 ? "positive" : "negative"}">${money(result)}</b>
-          </div>
-        </div>`;
-    })
-    .join("");
-}
-
-/* ---------- TARJETAS ---------- */
-const cardForm = document.getElementById("card-form");
-document.getElementById("card-first-month").value = currentMonthKey();
-
-cardForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  if (!currentPin) return;
-
-  const description = document.getElementById("card-desc").value.trim();
-  const totalAmount = parseFloat(document.getElementById("card-total").value);
-  const installments = parseInt(document.getElementById("card-installments").value, 10);
-  const firstMonth = document.getElementById("card-first-month").value;
-
-  if (!description || !totalAmount || !installments || !firstMonth) return;
-
-  await addDoc(collection(db, "pins", currentPin, "cards"), {
-    description, totalAmount, installments, firstMonth, createdAt: serverTimestamp()
-  });
-
-  cardForm.reset();
-  document.getElementById("card-first-month").value = currentMonthKey();
-});
-
-function renderCards() {
-  const list = document.getElementById("cards-list");
-  if (cards.length === 0) {
-    list.innerHTML = `<div class="empty-state">Todavía no cargaste ninguna compra.</div>`;
+  if (tarjetas.length === 0) {
+    container.innerHTML = `<div class="empty-state">Todavía no creaste ninguna tarjeta. Usá el formulario de arriba.</div>`;
+    document.getElementById("tarjetas-grand-total").innerHTML = "";
     return;
   }
-  list.innerHTML = cards
-    .map((c) => {
-      const cuota = c.totalAmount / c.installments;
-      const lastMonth = addMonths(c.firstMonth, c.installments - 1);
+
+  container.innerHTML = tarjetas.map((t) => {
+    const comprasCard = compras.filter((c) => c.tarjetaId === t.id);
+
+    const rows = comprasCard.map((c) => {
+      const cuota = c.montoTotal / c.cuotas;
+      const cells = months.map((mk) => {
+        const val = cuotaMontoForMonth(c, mk);
+        return `<td class="amount ${val ? "" : "muted"}">${val ? money(val) : "—"}</td>`;
+      }).join("");
       return `
-        <div class="tx-row" data-id="${c.id}">
-          <div class="tx-info">
-            <div class="tx-cat">${escapeHtml(c.description)}</div>
-            <div class="tx-meta">${c.installments} cuotas de ${money(cuota)} · ${formatMonth(c.firstMonth)} a ${formatMonth(lastMonth)}</div>
-          </div>
-          <div class="tx-right">
-            <div class="tx-amount expense">${money(c.totalAmount)}</div>
-            <button class="tx-delete" data-collection="cards" data-id="${c.id}" aria-label="Eliminar">×</button>
-          </div>
-        </div>`;
-    })
-    .join("");
-}
+        <tr>
+          <td class="row-label">${escapeHtml(c.detalle)}<br><span style="font-weight:400;font-size:.72rem;color:var(--muted)">${c.cuotas} cuotas de ${money(cuota)}</span></td>
+          ${cells}
+          <td class="row-delete"><button data-collection="compras" data-id="${c.id}" aria-label="Eliminar">×</button></td>
+        </tr>`;
+    }).join("");
 
-/* ---------- SUELDO ---------- */
-const salaryForm = document.getElementById("salary-form");
-document.getElementById("salary-month").value = currentMonthKey();
+    const comisionCells = months.map((mk) => {
+      const val = comisionForMonth(t.id, mk);
+      return `<td class="amount ${val ? "" : "muted"}">${val ? money(val) : "—"}</td>`;
+    }).join("");
 
-salaryForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  if (!currentPin) return;
+    const totalCells = months.map((mk) => `<td class="amount">${money(tarjetaTotalForMonth(t.id, mk))}</td>`).join("");
 
-  const amount = parseFloat(document.getElementById("salary-amount").value);
-  const month = document.getElementById("salary-month").value;
-  const note = document.getElementById("salary-note").value.trim();
+    const thead = `<tr><th>Detalle</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}<th></th></tr>`;
 
-  if (!amount || !month) return;
-
-  await addDoc(collection(db, "pins", currentPin, "salaries"), {
-    amount, month, note, createdAt: serverTimestamp()
-  });
-
-  salaryForm.reset();
-  document.getElementById("salary-month").value = currentMonthKey();
-});
-
-function renderSalaries() {
-  const list = document.getElementById("salary-list");
-  if (salaries.length === 0) {
-    list.innerHTML = `<div class="empty-state">Todavía no cargaste ningún sueldo.</div>`;
-    return;
-  }
-  list.innerHTML = salaries
-    .map((s) => `
-      <div class="tx-row" data-id="${s.id}">
-        <div class="tx-info">
-          <div class="tx-cat">${formatMonth(s.month)}</div>
-          <div class="tx-meta">${s.note ? escapeHtml(s.note) : "Sueldo"}</div>
+    return `
+      <div class="group-block">
+        <div class="group-header">
+          <h3>${escapeHtml(t.nombre)}</h3>
+          <button class="group-delete" data-collection="tarjetas" data-id="${t.id}">Eliminar tarjeta</button>
         </div>
-        <div class="tx-right">
-          <div class="tx-amount income">+ ${money(s.amount)}</div>
-          <button class="tx-delete" data-collection="salaries" data-id="${s.id}" aria-label="Eliminar">×</button>
+        <div class="group-body">
+          <form class="sub-form compra-form" data-tarjeta-id="${t.id}">
+            <div class="sf-field sf-desc"><label>Detalle</label><input type="text" class="c-detalle" placeholder="Ej: Heladera" required /></div>
+            <div class="sf-field sf-num"><label>Monto total</label><input type="number" class="c-total" step="0.01" min="0" required /></div>
+            <div class="sf-field sf-num"><label>Cuotas</label><input type="number" class="c-cuotas" min="1" step="1" required /></div>
+            <div class="sf-field sf-month"><label>1ª cuota</label><input type="month" class="c-mes" value="${currentMonthKey()}" required /></div>
+            <button type="submit">+ Agregar compra</button>
+          </form>
+
+          <form class="sub-form comision-form" data-tarjeta-id="${t.id}">
+            <div class="sf-field sf-num"><label>Comisión</label><input type="number" class="cm-monto" step="0.01" min="0" required /></div>
+            <div class="sf-field sf-month"><label>Mes</label><input type="month" class="cm-mes" value="${currentMonthKey()}" required /></div>
+            <button type="submit">+ Agregar comisión</button>
+          </form>
+
+          <div class="matrix-wrap">
+            <table class="matrix-table">
+              <thead>${thead}</thead>
+              <tbody>
+                ${rows || `<tr><td colspan="${months.length + 2}" class="empty-state">Sin compras cargadas.</td></tr>`}
+                <tr><td class="row-label">Comisión</td>${comisionCells}<td></td></tr>
+                <tr class="total-row"><td class="row-label">Total tarjeta</td>${totalCells}<td></td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>`)
-    .join("");
-}
+      </div>`;
+  }).join("");
 
-/* ---------- GASTOS ---------- */
-const expenseForm = document.getElementById("expense-form");
-const expenseCategory = document.getElementById("expense-category");
-expenseCategory.innerHTML = EXPENSE_CATEGORIES.map((c) => `<option value="${c}">${c}</option>`).join("");
-document.getElementById("expense-date").value = new Date().toISOString().slice(0, 10);
+  // Grand total across all tarjetas
+  const months2 = months;
+  const grandCells = months2.map((mk) => {
+    const total = tarjetas.reduce((s, t) => s + tarjetaTotalForMonth(t.id, mk), 0);
+    return `<td class="amount">${money(total)}</td>`;
+  }).join("");
+  document.getElementById("tarjetas-grand-total").innerHTML = `
+    <div class="matrix-wrap">
+      <table class="matrix-table">
+        <thead><tr><th>Total todas las tarjetas</th>${months2.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}</tr></thead>
+        <tbody><tr class="total-row"><td class="row-label">Total</td>${grandCells}</tr></tbody>
+      </table>
+    </div>`;
 
-expenseForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  if (!currentPin) return;
-
-  const amount = parseFloat(document.getElementById("expense-amount").value);
-  const date = document.getElementById("expense-date").value;
-  const category = expenseCategory.value;
-  const note = document.getElementById("expense-note").value.trim();
-
-  if (!amount || !date) return;
-
-  await addDoc(collection(db, "pins", currentPin, "expenses"), {
-    amount, date, category, note, createdAt: serverTimestamp()
+  // Bind sub-forms
+  container.querySelectorAll(".compra-form").forEach((f) => {
+    f.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const tarjetaId = f.dataset.tarjetaId;
+      const detalle = f.querySelector(".c-detalle").value.trim();
+      const montoTotal = parseFloat(f.querySelector(".c-total").value);
+      const cuotas = parseInt(f.querySelector(".c-cuotas").value, 10);
+      const mesPrimeraCuota = f.querySelector(".c-mes").value;
+      if (!detalle || !montoTotal || !cuotas || !mesPrimeraCuota) return;
+      await addDoc(col("compras"), {
+        tarjetaId, detalle,
+        fecha: new Date().toISOString().slice(0, 10),
+        montoTotal, cuotas, mesPrimeraCuota,
+        createdAt: serverTimestamp()
+      });
+    });
   });
 
-  expenseForm.reset();
-  document.getElementById("expense-date").value = new Date().toISOString().slice(0, 10);
-});
-
-function renderExpenses() {
-  const list = document.getElementById("expenses-list");
-  if (expenses.length === 0) {
-    list.innerHTML = `<div class="empty-state">Todavía no cargaste ningún gasto.</div>`;
-    return;
-  }
-  list.innerHTML = expenses
-    .map((ex) => {
-      const dateFmt = new Date(ex.date + "T00:00:00").toLocaleDateString("es-ES", { day: "2-digit", month: "short" });
-      return `
-        <div class="tx-row" data-id="${ex.id}">
-          <div class="tx-info">
-            <div class="tx-cat">${escapeHtml(ex.category)}</div>
-            <div class="tx-meta">${dateFmt}${ex.note ? " · " + escapeHtml(ex.note) : ""}</div>
-          </div>
-          <div class="tx-right">
-            <div class="tx-amount expense">− ${money(ex.amount)}</div>
-            <button class="tx-delete" data-collection="expenses" data-id="${ex.id}" aria-label="Eliminar">×</button>
-          </div>
-        </div>`;
-    })
-    .join("");
+  container.querySelectorAll(".comision-form").forEach((f) => {
+    f.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const tarjetaId = f.dataset.tarjetaId;
+      const monto = parseFloat(f.querySelector(".cm-monto").value);
+      const month = f.querySelector(".cm-mes").value;
+      if (!monto || !month) return;
+      await addDoc(col("comisiones"), { tarjetaId, monto, month, createdAt: serverTimestamp() });
+    });
+  });
 }
 
-/* ---------- Delete (delegated across all 3 lists) ---------- */
+/* =========================================================
+   SUELDO
+   ========================================================= */
+document.getElementById("empresa-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const nombre = document.getElementById("empresa-nombre").value.trim();
+  if (!nombre || !currentPin) return;
+  await addDoc(col("empresas"), { nombre, createdAt: serverTimestamp() });
+  e.target.reset();
+});
+
+function pagoHaberesForMonth(empresaId, monthKey) {
+  return sueldos
+    .filter((s) => s.empresaId === empresaId && s.mesPago === monthKey)
+    .reduce((sum, s) => sum + (s.pagoHaberes || 0), 0);
+}
+
+function renderSueldo() {
+  const container = document.getElementById("empresas-container");
+  const months = monthRange();
+
+  if (empresas.length === 0) {
+    container.innerHTML = `<div class="empty-state">Todavía no creaste ninguna empresa. Usá el formulario de arriba.</div>`;
+    document.getElementById("sueldo-grand-total").innerHTML = "";
+    return;
+  }
+
+  const fields = [
+    { key: "bruto", label: "Bruto" },
+    { key: "neto", label: "Neto sin comedor" },
+    { key: "ninera", label: "Niñera" },
+    { key: "comedor", label: "Comedor" },
+    { key: "pagoHaberes", label: "Pago haberes" },
+  ];
+
+  container.innerHTML = empresas.map((emp) => {
+    const rows = fields.map((f) => {
+      const cells = months.map((mk) => {
+        const entries = sueldos.filter((s) => s.empresaId === emp.id && s.mesPago === mk);
+        const val = entries.reduce((sum, s) => sum + (s[f.key] || 0), 0);
+        return `<td class="amount ${val ? "" : "muted"}">${val ? money(val) : "—"}</td>`;
+      }).join("");
+      const isTotal = f.key === "pagoHaberes";
+      return `<tr class="${isTotal ? "total-row" : ""}"><td class="row-label">${f.label}</td>${cells}<td></td></tr>`;
+    }).join("");
+
+    const thead = `<tr><th>Concepto</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}<th></th></tr>`;
+
+    // list of individual entries (to allow delete)
+    const entriesRows = sueldos.filter((s) => s.empresaId === emp.id).map((s) => `
+      <tr>
+        <td class="row-label">${formatMonthShort(s.mesPago)}${s.periodoPagado ? ` <span style="font-weight:400;color:var(--muted);font-size:.72rem">(trabajado: ${escapeHtml(s.periodoPagado)})</span>` : ""}</td>
+        <td class="amount">${money(s.pagoHaberes)}</td>
+        <td class="row-delete"><button data-collection="sueldos" data-id="${s.id}" aria-label="Eliminar">×</button></td>
+      </tr>`).join("");
+
+    return `
+      <div class="group-block">
+        <div class="group-header">
+          <h3>${escapeHtml(emp.nombre)}</h3>
+          <button class="group-delete" data-collection="empresas" data-id="${emp.id}">Eliminar empresa</button>
+        </div>
+        <div class="group-body">
+          <form class="sub-form sueldo-form" data-empresa-id="${emp.id}">
+            <div class="sf-field sf-month"><label>Mes de pago</label><input type="month" class="s-mes" value="${currentMonthKey()}" required /></div>
+            <div class="sf-field sf-desc" style="flex:0 0 110px"><label>Período trabajado (opcional)</label><input type="text" class="s-periodo" placeholder="Ej: may-26" /></div>
+            <div class="sf-field sf-num"><label>Bruto</label><input type="number" class="s-bruto" step="0.01" min="0" /></div>
+            <div class="sf-field sf-num"><label>Neto s/comedor</label><input type="number" class="s-neto" step="0.01" min="0" /></div>
+            <div class="sf-field sf-num"><label>Niñera</label><input type="number" class="s-ninera" step="0.01" min="0" /></div>
+            <div class="sf-field sf-num"><label>Comedor</label><input type="number" class="s-comedor" step="0.01" min="0" /></div>
+            <div class="sf-field sf-num"><label>Pago haberes</label><input type="number" class="s-haberes" step="0.01" min="0" required /></div>
+            <button type="submit">+ Agregar sueldo</button>
+          </form>
+
+          <div class="matrix-wrap">
+            <table class="matrix-table">
+              <thead>${thead}</thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+
+          ${entriesRows ? `
+          <div class="matrix-wrap" style="margin-top:.6rem">
+            <table class="matrix-table">
+              <thead><tr><th>Sueldos cargados</th><th>Pago haberes</th><th></th></tr></thead>
+              <tbody>${entriesRows}</tbody>
+            </table>
+          </div>` : ""}
+        </div>
+      </div>`;
+  }).join("");
+
+  const grandCells = months.map((mk) => {
+    const total = empresas.reduce((s, e) => s + pagoHaberesForMonth(e.id, mk), 0);
+    return `<td class="amount">${money(total)}</td>`;
+  }).join("");
+  document.getElementById("sueldo-grand-total").innerHTML = `
+    <div class="matrix-wrap">
+      <table class="matrix-table">
+        <thead><tr><th>Total bolsillo</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}</tr></thead>
+        <tbody><tr class="total-row"><td class="row-label">Total</td>${grandCells}</tr></tbody>
+      </table>
+    </div>`;
+
+  container.querySelectorAll(".sueldo-form").forEach((f) => {
+    f.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const empresaId = f.dataset.empresaId;
+      const mesPago = f.querySelector(".s-mes").value;
+      const periodoPagado = f.querySelector(".s-periodo").value.trim();
+      const bruto = parseFloat(f.querySelector(".s-bruto").value) || 0;
+      const neto = parseFloat(f.querySelector(".s-neto").value) || 0;
+      const ninera = parseFloat(f.querySelector(".s-ninera").value) || 0;
+      const comedor = parseFloat(f.querySelector(".s-comedor").value) || 0;
+      const pagoHaberes = parseFloat(f.querySelector(".s-haberes").value);
+      if (!mesPago || !pagoHaberes) return;
+      await addDoc(col("sueldos"), {
+        empresaId, mesPago, periodoPagado, bruto, neto, ninera, comedor, pagoHaberes,
+        createdAt: serverTimestamp()
+      });
+    });
+  });
+}
+
+/* =========================================================
+   GASTOS (resumen general)
+   ========================================================= */
+document.getElementById("categoria-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const nombre = document.getElementById("categoria-nombre").value.trim();
+  if (!nombre || !currentPin) return;
+  await addDoc(col("categoriasGasto"), { nombre, createdAt: serverTimestamp() });
+  e.target.reset();
+});
+
+document.getElementById("otro-ingreso-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const monto = parseFloat(document.getElementById("oi-monto").value);
+  const month = document.getElementById("oi-mes").value;
+  const nota = document.getElementById("oi-nota").value.trim();
+  if (!monto || !month) return;
+  await addDoc(col("otrosIngresos"), { monto, month, nota, createdAt: serverTimestamp() });
+  e.target.reset();
+  document.getElementById("oi-mes").value = currentMonthKey();
+});
+
+document.getElementById("gasto-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const categoriaId = document.getElementById("gasto-categoria").value;
+  const monto = parseFloat(document.getElementById("gasto-monto").value);
+  const month = document.getElementById("gasto-mes").value;
+  const nota = document.getElementById("gasto-nota").value.trim();
+  if (!categoriaId || !monto || !month) return;
+  await addDoc(col("gastos"), { categoriaId, monto, month, nota, createdAt: serverTimestamp() });
+  e.target.reset();
+  document.getElementById("gasto-mes").value = currentMonthKey();
+});
+
+function otrosIngresosForMonth(monthKey) {
+  return otrosIngresos.filter((o) => o.month === monthKey).reduce((s, o) => s + o.monto, 0);
+}
+function categoriaTotalForMonth(categoriaId, monthKey) {
+  return gastos.filter((g) => g.categoriaId === categoriaId && g.month === monthKey).reduce((s, g) => s + g.monto, 0);
+}
+function overrideId(tarjetaId, monthKey) { return `${tarjetaId}_${monthKey}`; }
+function pagoTarjetaOverride(tarjetaId, monthKey) {
+  return pagosTarjeta.find((p) => p.tarjetaId === tarjetaId && p.month === monthKey) || null;
+}
+// Monto que efectivamente se usa en el resumen de Gastos: el editado a mano si existe, sino el calculado
+function pagoTarjetaEfectivo(tarjetaId, monthKey) {
+  const override = pagoTarjetaOverride(tarjetaId, monthKey);
+  return override ? override.monto : tarjetaTotalForMonth(tarjetaId, monthKey);
+}
+async function guardarPagoTarjeta(tarjetaId, monthKey, monto, montoCalculado) {
+  if (!currentPin) return;
+  const ref = doc(db, "pins", currentPin, "pagosTarjeta", overrideId(tarjetaId, monthKey));
+  if (Math.abs(monto - montoCalculado) < 0.005) {
+    await deleteDoc(ref).catch(() => {}); // vuelve a seguir el cálculo automático
+  } else {
+    await setDoc(ref, { tarjetaId, month: monthKey, monto, createdAt: serverTimestamp() });
+  }
+}
+
+function renderGastos() {
+  // populate category select
+  const sel = document.getElementById("gasto-categoria");
+  const prev = sel.value;
+  sel.innerHTML = categorias.map((c) => `<option value="${c.id}">${escapeHtml(c.nombre)}</option>`).join("");
+  if (prev) sel.value = prev;
+
+  if (!document.getElementById("oi-mes").value) document.getElementById("oi-mes").value = currentMonthKey();
+  if (!document.getElementById("gasto-mes").value) document.getElementById("gasto-mes").value = currentMonthKey();
+
+  const months = monthRange();
+  const rows = [];
+
+  rows.push(`<tr class="section-row"><td class="row-label">Ingresos</td>${months.map(() => "<td></td>").join("")}</tr>`);
+  empresas.forEach((emp) => {
+    const cells = months.map((mk) => {
+      const v = pagoHaberesForMonth(emp.id, mk);
+      return `<td class="amount ${v ? "" : "muted"}">${v ? money(v) : "—"}</td>`;
+    }).join("");
+    rows.push(`<tr><td class="row-label">${escapeHtml(emp.nombre)}</td>${cells}</tr>`);
+  });
+  const otrosCells = months.map((mk) => {
+    const v = otrosIngresosForMonth(mk);
+    return `<td class="amount ${v ? "" : "muted"}">${v ? money(v) : "—"}</td>`;
+  }).join("");
+  rows.push(`<tr><td class="row-label">Otros ingresos</td>${otrosCells}</tr>`);
+
+  const ingresosTotalCells = months.map((mk) => {
+    const total = empresas.reduce((s, e) => s + pagoHaberesForMonth(e.id, mk), 0) + otrosIngresosForMonth(mk);
+    return `<td class="amount">${money(total)}</td>`;
+  });
+  rows.push(`<tr class="total-row"><td class="row-label">Ingresos total</td>${ingresosTotalCells.join("")}</tr>`);
+
+  rows.push(`<tr class="section-row"><td class="row-label">Tarjetas</td>${months.map(() => "<td></td>").join("")}</tr>`);
+  tarjetas.forEach((t) => {
+    const cells = months.map((mk) => {
+      const calculado = tarjetaTotalForMonth(t.id, mk);
+      const override = pagoTarjetaOverride(t.id, mk);
+      const valor = override ? override.monto : calculado;
+      return `<td class="amount editable-cell">
+        <input type="number" step="0.01" class="tarjeta-pago-input ${override ? "edited" : ""}"
+          data-tarjeta-id="${t.id}" data-month="${mk}" data-calculado="${calculado}"
+          value="${valor || ""}" placeholder="0" title="${override ? "Editado a mano — distinto al total de cuotas" : "Calculado automáticamente. Cambialo si vas a pagar otro monto."}" />
+      </td>`;
+    }).join("");
+    rows.push(`<tr><td class="row-label">${escapeHtml(t.nombre)}</td>${cells}</tr>`);
+  });
+
+  rows.push(`<tr class="section-row"><td class="row-label">Gastos</td>${months.map(() => "<td></td>").join("")}</tr>`);
+  categorias.forEach((c) => {
+    const cells = months.map((mk) => {
+      const v = categoriaTotalForMonth(c.id, mk);
+      return `<td class="amount ${v ? "" : "muted"}">${v ? money(v) : "—"}</td>`;
+    }).join("");
+    rows.push(`<tr><td class="row-label">${escapeHtml(c.nombre)}</td>${cells}</tr>`);
+  });
+
+  const gastoTotalCells = months.map((mk) => {
+    const tarjetasTotal = tarjetas.reduce((s, t) => s + pagoTarjetaEfectivo(t.id, mk), 0);
+    const categoriasTotal = categorias.reduce((s, c) => s + categoriaTotalForMonth(c.id, mk), 0);
+    return { mk, total: tarjetasTotal + categoriasTotal };
+  });
+  rows.push(`<tr class="total-row"><td class="row-label">Gasto total</td>${gastoTotalCells.map((g) => `<td class="amount">${money(g.total)}</td>`).join("")}</tr>`);
+
+  const saldoCells = months.map((mk, i) => {
+    const ingresos = empresas.reduce((s, e) => s + pagoHaberesForMonth(e.id, mk), 0) + otrosIngresosForMonth(mk);
+    const gastoTotal = gastoTotalCells[i].total; // ya usa pagoTarjetaEfectivo
+    const saldo = ingresos - gastoTotal;
+    return `<td class="amount ${saldo >= 0 ? "positive" : "negative"}">${money(saldo)}</td>`;
+  });
+  rows.push(`<tr class="saldo-row"><td class="row-label">Saldo</td>${saldoCells.join("")}</tr>`);
+
+  const thead = `<tr><th>Concepto</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}</tr>`;
+  document.getElementById("resumen-table").innerHTML = `<thead>${thead}</thead><tbody>${rows.join("")}</tbody>`;
+
+  document.querySelectorAll(".tarjeta-pago-input").forEach((input) => {
+    input.addEventListener("change", async (e) => {
+      const tarjetaId = input.dataset.tarjetaId;
+      const month = input.dataset.month;
+      const calculado = parseFloat(input.dataset.calculado);
+      const nuevo = parseFloat(input.value) || 0;
+      await guardarPagoTarjeta(tarjetaId, month, nuevo, calculado);
+    });
+  });
+
+  renderCategoriasList();
+}
+
+function renderCategoriasList() {
+  const container = document.getElementById("categorias-list");
+  if (categorias.length === 0) {
+    container.innerHTML = `<div class="empty-state">Todavía no creaste ninguna categoría de gasto.</div>`;
+    return;
+  }
+  container.innerHTML = categorias.map((c) => {
+    const entries = gastos.filter((g) => g.categoriaId === c.id).sort((a, b) => (a.month < b.month ? 1 : -1));
+    const entryRows = entries.map((g) => `
+      <tr>
+        <td class="row-label">${formatMonthShort(g.month)}${g.nota ? ` · ${escapeHtml(g.nota)}` : ""}</td>
+        <td class="amount">${money(g.monto)}</td>
+        <td class="row-delete"><button data-collection="gastos" data-id="${g.id}" aria-label="Eliminar">×</button></td>
+      </tr>`).join("");
+    return `
+      <div class="group-block">
+        <div class="group-header">
+          <h3>${escapeHtml(c.nombre)}</h3>
+          <button class="group-delete" data-collection="categoriasGasto" data-id="${c.id}">Eliminar categoría</button>
+        </div>
+        <div class="group-body">
+          ${entryRows ? `
+          <div class="matrix-wrap">
+            <table class="matrix-table">
+              <thead><tr><th>Mes</th><th>Monto</th><th></th></tr></thead>
+              <tbody>${entryRows}</tbody>
+            </table>
+          </div>` : `<div class="empty-state">Sin gastos cargados en esta categoría.</div>`}
+        </div>
+      </div>`;
+  }).join("");
+}
+
+/* ---------- Delegated delete for all lists ---------- */
 document.getElementById("app-screen").addEventListener("click", async (e) => {
-  const btn = e.target.closest(".tx-delete");
+  const btn = e.target.closest("[data-collection][data-id]");
   if (!btn || !currentPin) return;
   await deleteDoc(doc(db, "pins", currentPin, btn.dataset.collection, btn.dataset.id));
 });
