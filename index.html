@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Libro — Ingresos y Gastos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== Tokens ===== */
+:root {
+  --ink: #1c2541;
+  --ink-soft: #2e3a5c;
+  --paper: #f7f5ef;
+  --paper-line: #e2ddd0;
+  --gold: #b9863f;
+  --income: #2f6b4f;
+  --expense: #a6432e;
+  --muted: #6b6a63;
+  --white: #ffffff;
+
+  --font-display: 'Spectral', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  background-image: linear-gradient(var(--paper-line) 1px, transparent 1px);
+  background-size: 100% 2.1rem;
+  background-attachment: local;
+}
+
+.hidden { display: none !important; }
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+input, select {
+  font-family: var(--font-body);
+}
+
+/* ===== Login screen ===== */
+#login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: var(--paper);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--white);
+  border: 1px solid var(--paper-line);
+  border-radius: 4px;
+  padding: 2.25rem 1.75rem;
+  box-shadow: 0 1px 3px rgba(28, 37, 65, 0.08);
+}
+
+.login-mark {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+  text-align: center;
+  position: relative;
+}
+
+.login-mark span {
+  display: inline-block;
+  border-bottom: 3px solid var(--gold);
+  padding-bottom: 2px;
+}
+
+.login-sub {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 0.35rem 0 1.75rem;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+.field label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.field input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--paper-line);
+  border-radius: 3px;
+  font-size: 0.95rem;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.field input:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+  background: var(--white);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--ink);
+  color: var(--white);
+  border: none;
+  border-radius: 3px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-top: 0.4rem;
+}
+
+.btn-primary:hover { background: var(--ink-soft); }
+.btn-primary:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.auth-toggle {
+  text-align: center;
+  margin-top: 1.1rem;
+  font-size: 0.83rem;
+  color: var(--muted);
+}
+
+.auth-toggle button {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-weight: 600;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.auth-error {
+  color: var(--expense);
+  font-size: 0.82rem;
+  text-align: center;
+  min-height: 1.2em;
+  margin-top: 0.6rem;
+}
+
+.pin-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--paper-line);
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 1.8rem;
+  letter-spacing: 0.6em;
+  text-align: center;
+  font-family: var(--font-mono);
+}
+
+.pin-input:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+  background: var(--white);
+}
+
+.pin-hint {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.76rem;
+  margin-top: 1.1rem;
+  line-height: 1.4;
+}
+
+/* ===== App shell ===== */
+#app-screen {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1.25rem 1.1rem 6rem;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.4rem 0 1rem;
+}
+
+.topbar .brand {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.topbar .brand span { border-bottom: 2px solid var(--gold); }
+
+#logout-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-decoration: underline;
+}
+
+/* ===== Balance ledger stamp ===== */
+.balance-card {
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 6px;
+  padding: 1.5rem 1.4rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.balance-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #a9b0c9;
+  margin: 0 0 0.3rem;
+}
+
+.balance-amount {
+  font-family: var(--font-mono);
+  font-size: 2.3rem;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.balance-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  font-size: 0.82rem;
+}
+
+.balance-row .stat b {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+}
+
+.stat.income b { color: #7fd3a5; }
+.stat.expense b { color: #e08b7d; }
+.stat span { color: #a9b0c9; }
+
+/* ===== Add transaction form ===== */
+.add-card {
+  background: var(--white);
+  border: 1px solid var(--paper-line);
+  border-radius: 6px;
+  padding: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.add-card h2 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  margin: 0 0 0.9rem;
+}
+
+.type-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+
+.type-toggle button {
+  flex: 1;
+  padding: 0.55rem;
+  border: 1px solid var(--paper-line);
+  background: var(--paper);
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.type-toggle button.active[data-type="income"] {
+  background: var(--income);
+  border-color: var(--income);
+  color: var(--white);
+}
+
+.type-toggle button.active[data-type="expense"] {
+  background: var(--expense);
+  border-color: var(--expense);
+  color: var(--white);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem;
+  margin-bottom: 0.7rem;
+}
+
+.form-grid .full { grid-column: 1 / -1; }
+
+.form-grid label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+
+.form-grid input, .form-grid select {
+  width: 100%;
+  padding: 0.55rem 0.6rem;
+  border: 1px solid var(--paper-line);
+  border-radius: 3px;
+  font-size: 0.9rem;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.add-card .btn-primary { margin-top: 0.3rem; }
+
+/* ===== Filters ===== */
+.filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  overflow-x: auto;
+}
+
+.filters select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--paper-line);
+  border-radius: 3px;
+  background: var(--white);
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+/* ===== Ledger list ===== */
+.ledger-heading {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  margin: 0 0 0.6rem;
+}
+
+.ledger {
+  border-top: 1px solid var(--paper-line);
+}
+
+.tx-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.1rem;
+  border-bottom: 1px solid var(--paper-line);
+}
+
+.tx-info { min-width: 0; }
+
+.tx-cat {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.tx-meta {
+  font-size: 0.76rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tx-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.tx-amount {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.tx-amount.income { color: var(--income); }
+.tx-amount.expense { color: var(--expense); }
+
+.tx-delete {
+  background: none;
+  border: none;
+  color: var(--paper-line);
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0.2rem;
+}
+
+.tx-delete:hover { color: var(--expense); }
+
+.empty-state {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding: 2.5rem 1rem;
+}
+
+@media (max-width: 420px) {
+  .balance-amount { font-size: 1.9rem; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <p class="login-mark"><span>Libro</span></p>
+    <p class="login-sub">Ingresá tu PIN de 4 dígitos</p>
+
+    <form id="auth-form">
+      <div class="field">
+        <input
+          type="password"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          id="pin"
+          class="pin-input"
+          maxlength="4"
+          required
+          autocomplete="off"
+          placeholder="••••"
+        />
+      </div>
+      <button type="submit" class="btn-primary" id="auth-submit">Entrar</button>
+      <p class="auth-error" id="auth-error"></p>
+    </form>
+
+    <p class="pin-hint">La primera vez que uses un PIN, queda creado. Usá siempre el mismo PIN en todos tus dispositivos para ver los mismos datos.</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen" class="hidden">
+  <div class="topbar">
+    <div class="brand"><span>Libro</span></div>
+    <button id="logout-btn">Cambiar PIN</button>
+  </div>
+
+  <div class="balance-card">
+    <p class="balance-label">Balance actual</p>
+    <p class="balance-amount" id="balance-amount">$0,00</p>
+    <div class="balance-row">
+      <div class="stat income">
+        <span>Ingresos</span>
+        <b id="total-income">$0,00</b>
+      </div>
+      <div class="stat expense">
+        <span>Gastos</span>
+        <b id="total-expense">$0,00</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="add-card">
+    <h2>Nuevo movimiento</h2>
+    <form id="tx-form">
+      <div class="type-toggle">
+        <button type="button" data-type="expense" class="active">Gasto</button>
+        <button type="button" data-type="income">Ingreso</button>
+      </div>
+      <div class="form-grid">
+        <div>
+          <label for="tx-amount">Monto</label>
+          <input type="number" id="tx-amount" step="0.01" min="0" required placeholder="0.00" />
+        </div>
+        <div>
+          <label for="tx-date">Fecha</label>
+          <input type="date" id="tx-date" required />
+        </div>
+        <div>
+          <label for="tx-category">Categoría</label>
+          <select id="tx-category"></select>
+        </div>
+        <div>
+          <label for="tx-note">Nota (opcional)</label>
+          <input type="text" id="tx-note" placeholder="Detalle" />
+        </div>
+      </div>
+      <button type="submit" class="btn-primary">Agregar</button>
+    </form>
+  </div>
+
+  <div class="filters">
+    <select id="filter-type">
+      <option value="all">Todos</option>
+      <option value="income">Ingresos</option>
+      <option value="expense">Gastos</option>
+    </select>
+    <select id="filter-month"></select>
+  </div>
+
+  <h3 class="ledger-heading">Movimientos</h3>
+  <div class="ledger" id="ledger-list">
+    <div class="empty-state">Todavía no cargaste ningún movimiento.</div>
+  </div>
+</div>
+
+<script type="module">
+const firebaseConfig = {
+  apiKey: "AIzaSyBV9SOiMEe-xGmcuTVL-Kr24argepucVrQ",
+  authDomain: "billeteravo.firebaseapp.com",
+  projectId: "billeteravo",
+  storageBucket: "billeteravo.firebasestorage.app",
+  messagingSenderId: "115924821342",
+  appId: "1:115924821342:web:8a29337129458cedce5bcf"
+};
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, signInAnonymously
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, deleteDoc, doc,
+  onSnapshot, query, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const PIN_STORAGE_KEY = "libro-pin";
+let currentPin = null;
+
+const CATEGORIES = {
+  expense: ["Comida", "Transporte", "Vivienda", "Servicios", "Salud", "Ocio", "Otro"],
+  income: ["Sueldo", "Venta", "Freelance", "Regalo", "Otro"]
+};
+
+let currentType = "expense";
+let unsubscribeTx = null;
+let allTx = [];
+
+/* ---------- Auth UI (PIN-based) ---------- */
+const loginScreen = document.getElementById("login-screen");
+const appScreen = document.getElementById("app-screen");
+const authForm = document.getElementById("auth-form");
+const authError = document.getElementById("auth-error");
+const pinInput = document.getElementById("pin");
+
+authForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  authError.textContent = "";
+  const pin = pinInput.value.trim();
+
+  if (!/^\d{4}$/.test(pin)) {
+    authError.textContent = "El PIN debe tener 4 números.";
+    return;
+  }
+
+  try {
+    if (!auth.currentUser) {
+      await signInAnonymously(auth);
+    }
+    currentPin = pin;
+    localStorage.setItem(PIN_STORAGE_KEY, pin);
+    loginScreen.classList.add("hidden");
+    appScreen.classList.remove("hidden");
+    startListening(currentPin);
+  } catch (err) {
+    authError.textContent = "No se pudo conectar. Probá de nuevo.";
+  }
+});
+
+document.getElementById("logout-btn").addEventListener("click", () => {
+  localStorage.removeItem(PIN_STORAGE_KEY);
+  currentPin = null;
+  if (unsubscribeTx) unsubscribeTx();
+  allTx = [];
+  appScreen.classList.add("hidden");
+  loginScreen.classList.remove("hidden");
+  pinInput.value = "";
+  pinInput.focus();
+});
+
+// Al cargar la página: si ya hay un PIN guardado en este dispositivo, entra directo.
+onAuthStateChanged(auth, async (user) => {
+  const savedPin = localStorage.getItem(PIN_STORAGE_KEY);
+  if (savedPin) {
+    if (!user) await signInAnonymously(auth);
+    currentPin = savedPin;
+    loginScreen.classList.add("hidden");
+    appScreen.classList.remove("hidden");
+    startListening(currentPin);
+  }
+});
+
+/* ---------- Transaction form ---------- */
+const typeButtons = document.querySelectorAll(".type-toggle button");
+const categorySelect = document.getElementById("tx-category");
+const txForm = document.getElementById("tx-form");
+const dateInput = document.getElementById("tx-date");
+
+dateInput.value = new Date().toISOString().slice(0, 10);
+populateCategories();
+
+typeButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    typeButtons.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentType = btn.dataset.type;
+    populateCategories();
+  });
+});
+
+function populateCategories() {
+  categorySelect.innerHTML = CATEGORIES[currentType]
+    .map((c) => `<option value="${c}">${c}</option>`)
+    .join("");
+}
+
+txForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!currentPin) return;
+
+  const amount = parseFloat(document.getElementById("tx-amount").value);
+  const date = document.getElementById("tx-date").value;
+  const category = categorySelect.value;
+  const note = document.getElementById("tx-note").value.trim();
+
+  if (!amount || amount <= 0) return;
+
+  await addDoc(collection(db, "pins", currentPin, "transactions"), {
+    type: currentType,
+    amount,
+    date,
+    category,
+    note,
+    createdAt: serverTimestamp()
+  });
+
+  txForm.reset();
+  dateInput.value = new Date().toISOString().slice(0, 10);
+  document.getElementById("tx-amount").focus();
+});
+
+/* ---------- Firestore listener ---------- */
+function startListening(pin) {
+  const q = query(collection(db, "pins", pin, "transactions"), orderBy("date", "desc"));
+  unsubscribeTx = onSnapshot(q, (snapshot) => {
+    allTx = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+    populateMonthFilter();
+    render();
+  });
+}
+
+/* ---------- Filters ---------- */
+const filterType = document.getElementById("filter-type");
+const filterMonth = document.getElementById("filter-month");
+filterType.addEventListener("change", render);
+filterMonth.addEventListener("change", render);
+
+function populateMonthFilter() {
+  const months = [...new Set(allTx.map((t) => t.date.slice(0, 7)))].sort().reverse();
+  const current = filterMonth.value;
+  filterMonth.innerHTML =
+    `<option value="all">Todos los meses</option>` +
+    months.map((m) => `<option value="${m}">${formatMonth(m)}</option>`).join("");
+  if (months.includes(current)) filterMonth.value = current;
+}
+
+function formatMonth(m) {
+  const [y, mo] = m.split("-");
+  const d = new Date(Number(y), Number(mo) - 1, 1);
+  return d.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+}
+
+/* ---------- Render ---------- */
+const ledgerList = document.getElementById("ledger-list");
+const balanceAmount = document.getElementById("balance-amount");
+const totalIncomeEl = document.getElementById("total-income");
+const totalExpenseEl = document.getElementById("total-expense");
+
+function money(n) {
+  return "$" + n.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function render() {
+  let filtered = allTx;
+  if (filterType.value !== "all") filtered = filtered.filter((t) => t.type === filterType.value);
+  if (filterMonth.value !== "all") filtered = filtered.filter((t) => t.date.slice(0, 7) === filterMonth.value);
+
+  const income = allTx.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
+  const expense = allTx.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+  balanceAmount.textContent = money(income - expense);
+  totalIncomeEl.textContent = money(income);
+  totalExpenseEl.textContent = money(expense);
+
+  if (filtered.length === 0) {
+    ledgerList.innerHTML = `<div class="empty-state">No hay movimientos para este filtro.</div>`;
+    return;
+  }
+
+  ledgerList.innerHTML = filtered
+    .map((t) => {
+      const sign = t.type === "income" ? "+" : "−";
+      const dateFmt = new Date(t.date + "T00:00:00").toLocaleDateString("es-ES", {
+        day: "2-digit", month: "short"
+      });
+      return `
+        <div class="tx-row" data-id="${t.id}">
+          <div class="tx-info">
+            <div class="tx-cat">${escapeHtml(t.category)}</div>
+            <div class="tx-meta">${dateFmt}${t.note ? " · " + escapeHtml(t.note) : ""}</div>
+          </div>
+          <div class="tx-right">
+            <div class="tx-amount ${t.type}">${sign} ${money(t.amount)}</div>
+            <button class="tx-delete" data-id="${t.id}" aria-label="Eliminar">×</button>
+          </div>
+        </div>`;
+    })
+    .join("");
+}
+
+ledgerList.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".tx-delete");
+  if (!btn) return;
+  if (!currentPin) return;
+  await deleteDoc(doc(db, "pins", currentPin, "transactions", btn.dataset.id));
+});
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+</script>
+</body>
+</html>
