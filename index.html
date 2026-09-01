@@ -58,6 +58,21 @@ input, select { font-family: var(--font-body); }
 .tab-btn.active { background: var(--ink); color: var(--white); }
 #logout-btn { background: none; border: none; color: var(--muted); font-size: .78rem; text-decoration: underline; flex-shrink: 0; }
 .tab-panels { padding: 1rem 1.1rem 4rem; }
+.archive-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  flex-wrap: wrap;
+  padding: .6rem 1.25rem;
+  background: var(--gold-soft);
+  border-bottom: 1px solid var(--paper-line);
+  font-size: .8rem;
+}
+.archive-bar #archive-label { color: var(--ink); font-weight: 600; text-transform: capitalize; }
+.archive-actions { display: flex; gap: .6rem; align-items: center; }
+#archive-reset-btn { background: none; border: none; color: var(--muted); font-size: .76rem; text-decoration: underline; }
+#archive-btn { padding: .4rem .8rem; font-size: .78rem; }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
 
@@ -103,13 +118,58 @@ input, select { font-family: var(--font-body); }
 .matrix-table tr.saldo-row td.amount.positive { color: var(--income); background: var(--income-soft) !important; }
 .matrix-table tr.saldo-row td.amount.negative { color: var(--expense); background: var(--expense-soft) !important; }
 .matrix-table tr.section-row td { background: var(--ink-soft) !important; color: var(--white); font-weight: 600; font-size: .76rem; text-transform: uppercase; letter-spacing: .04em; }
+.matrix-table tr.alert-row td { background: var(--expense-soft) !important; color: var(--expense); font-weight: 700; }
+.pagado-toggle { background: none; border: 1px solid var(--paper-line); border-radius: 5px; width: 26px; height: 26px; font-size: .85rem; color: var(--income); }
+.pagado-toggle:hover { border-color: var(--gold); }
+
+.matrix-table td.gasto-cell { min-width: 108px; vertical-align: top; padding: .35rem .35rem; }
+.matrix-table td.gasto-cell.alert-cell { background: var(--expense-soft) !important; }
+.gasto-cell-meta {
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  margin-top: .2rem;
+}
+.gasto-cell-meta .gasto-venc-input {
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: .68rem;
+  color: var(--muted);
+  padding: .1rem .15rem;
+  border-radius: 3px;
+  font-family: var(--font-body);
+}
+.gasto-cell-meta .gasto-venc-input:hover { border-color: var(--paper-line); }
+.gasto-cell-meta .gasto-venc-input:focus { outline: none; border-color: var(--gold); background: var(--white); }
+.gasto-pagado-mini {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .2rem;
+  font-size: .64rem;
+  color: var(--muted);
+  text-transform: none;
+  font-weight: 400;
+}
+.gasto-pagado-mini input { width: auto; margin: 0; }
+
+.row-inline-delete {
+  background: none;
+  border: none;
+  color: var(--paper-line);
+  font-size: .85rem;
+  padding: 0 .15rem;
+  vertical-align: middle;
+}
+.row-inline-delete:hover { color: var(--expense); }
 .matrix-table td.muted { color: var(--muted); }
 .matrix-table td.row-delete { text-align: center; width: 32px; }
 .matrix-table td.row-delete button { background: none; border: none; color: var(--paper-line); font-size: 1rem; }
 .matrix-table td.row-delete button:hover { color: var(--expense); }
 
 .matrix-table td.editable-cell { padding: .3rem .4rem; }
-.tarjeta-pago-input {
+.tarjeta-pago-input, .comision-input {
   width: 90px;
   text-align: right;
   font-family: var(--font-mono);
@@ -120,8 +180,8 @@ input, select { font-family: var(--font-body); }
   padding: .3rem .35rem;
   border-radius: 4px;
 }
-.tarjeta-pago-input:hover { border-color: var(--paper-line); }
-.tarjeta-pago-input:focus { outline: none; border-color: var(--gold); background: var(--white); }
+.tarjeta-pago-input:hover, .comision-input:hover { border-color: var(--paper-line); }
+.tarjeta-pago-input:focus, .comision-input:focus { outline: none; border-color: var(--gold); background: var(--white); }
 .tarjeta-pago-input.edited { color: var(--gold); font-weight: 700; border-bottom: 1px dashed var(--gold); }
 
 .grand-total-wrap { margin-top: .5rem; }
@@ -210,30 +270,33 @@ input, select { font-family: var(--font-body); }
     <!-- ===================== GASTOS ===================== -->
     <section class="tab-panel" id="panel-gastos">
 
+      <div class="archive-bar">
+        <span id="archive-label">Mostrando desde —</span>
+        <div class="archive-actions">
+          <label style="display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--muted)">
+            <input type="checkbox" id="ver-archivados-toggle" style="width:auto" /> Ver meses archivados
+          </label>
+          <button id="archive-reset-btn" title="Volver al mes actual">↺ Volver a hoy</button>
+          <button id="archive-btn" class="btn-secondary">Archivar mes actual →</button>
+        </div>
+      </div>
+
       <div class="matrix-wrap">
         <table class="matrix-table" id="resumen-table"></table>
       </div>
 
       <div class="section-divider">Ingresos extra</div>
-      <div class="add-card">
-        <form id="otro-ingreso-form" class="form-grid">
-          <div>
-            <label for="oi-monto">Monto</label>
-            <input type="number" id="oi-monto" step="0.01" min="0" required placeholder="0.00" />
-          </div>
-          <div>
-            <label for="oi-mes">Mes</label>
-            <input type="month" id="oi-mes" required />
-          </div>
-          <div class="full">
-            <label for="oi-nota">Nota (opcional)</label>
-            <input type="text" id="oi-nota" placeholder="Ej: Aguinaldo, venta" />
-          </div>
-          <button type="submit" class="btn-primary full">Agregar ingreso extra</button>
+      <p style="font-size:.82rem;color:var(--muted);margin:-.5rem 0 .8rem">Acá también va lo que te devuelven tus papás o tu hermana por compras de tarjeta. Cargá el monto directo en la celda del mes, en el cuadro de arriba.</p>
+
+      <div class="mini-form-bar">
+        <form id="categoria-ingreso-form" class="mini-form">
+          <input type="text" id="categoria-ingreso-nombre" placeholder="Ej: Papá - reintegro tarjeta" required />
+          <button type="submit" class="btn-secondary">+ Nueva categoría de ingreso</button>
         </form>
       </div>
 
       <div class="section-divider">Categorías de gasto</div>
+      <p style="font-size:.82rem;color:var(--muted);margin:-.5rem 0 .8rem">Cargá el monto, vencimiento y si ya lo pagaste directo en la celda del mes, en el cuadro de arriba.</p>
       <div class="mini-form-bar">
         <form id="categoria-form" class="mini-form">
           <input type="text" id="categoria-nombre" placeholder="Nombre de categoría (ej: Alquiler)" required />
@@ -241,29 +304,10 @@ input, select { font-family: var(--font-body); }
         </form>
       </div>
 
-      <div class="add-card">
-        <form id="gasto-form" class="form-grid">
-          <div>
-            <label for="gasto-categoria">Categoría</label>
-            <select id="gasto-categoria" required></select>
-          </div>
-          <div>
-            <label for="gasto-monto">Monto</label>
-            <input type="number" id="gasto-monto" step="0.01" min="0" required placeholder="0.00" />
-          </div>
-          <div>
-            <label for="gasto-mes">Mes</label>
-            <input type="month" id="gasto-mes" required />
-          </div>
-          <div>
-            <label for="gasto-nota">Nota (opcional)</label>
-            <input type="text" id="gasto-nota" placeholder="Detalle" />
-          </div>
-          <button type="submit" class="btn-primary full">Agregar gasto</button>
-        </form>
+      <div class="section-divider">Gastos en USD (aparte de los pesos)</div>
+      <div class="matrix-wrap">
+        <table class="matrix-table" id="resumen-usd-table"></table>
       </div>
-
-      <div id="categorias-list"></div>
 
     </section>
 
@@ -280,9 +324,9 @@ const firebaseConfig = {
   appId: "1:115924821342:web:8a29337129458cedce5bcf"
 };
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  getFirestore, collection, addDoc, deleteDoc, doc, setDoc,
+  getFirestore, collection, addDoc, deleteDoc, doc, setDoc, updateDoc,
   onSnapshot, query, orderBy, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -290,7 +334,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const PIN_STORAGE_KEY = "libro-pin";
 let currentPin = null;
 let unsubs = [];
 
@@ -302,8 +345,10 @@ let empresas = [];      // {id, nombre}
 let sueldos = [];       // {id, empresaId, mesPago, bruto, neto, ninera, comedor, pagoHaberes}
 let categorias = [];    // {id, nombre}
 let gastos = [];        // {id, categoriaId, month, monto, nota}
-let otrosIngresos = []; // {id, month, monto, nota}
+let otrosIngresos = []; // {id, categoriaId, month, monto, nota}
+let categoriasIngreso = []; // {id, nombre}
 let pagosTarjeta = [];  // {id, tarjetaId, month, monto} — override manual del pago real de tarjeta
+let settings = { mesInicio: null }; // ventana de meses visible (archivado manual)
 
 /* ---------- Helpers ---------- */
 function money(n) {
@@ -329,10 +374,44 @@ function escapeHtml(str) {
   div.textContent = str || "";
   return div.innerHTML;
 }
-const MONTH_OFFSETS = [-1, 0, 1, 2, 3, 4, 5];
-function monthRange() {
-  const cur = currentMonthKey();
-  return MONTH_OFFSETS.map((o) => addMonths(cur, o));
+const MONTH_OFFSETS = [0, 1, 2, 3, 4];
+let showArchivedGastos = false;
+
+// Rango estándar: siempre desde el mes real, 5 meses. Usado en Tarjetas y Sueldo (no se archiva).
+function standardMonthRange() {
+  const start = currentMonthKey();
+  return MONTH_OFFSETS.map((o) => addMonths(start, o));
+}
+
+// Rango de Gastos: puede archivarse hacia adelante, o expandirse para ver meses archivados.
+function gastosEffectiveStartMonth() {
+  const real = currentMonthKey();
+  if (settings.mesInicio && settings.mesInicio > real) return settings.mesInicio;
+  return real;
+}
+function gastosMonthRange() {
+  if (showArchivedGastos) {
+    const start = addMonths(currentMonthKey(), -12);
+    const end = addMonths(currentMonthKey(), 4);
+    const result = [];
+    let cur = start;
+    while (cur <= end) { result.push(cur); cur = addMonths(cur, 1); }
+    return result;
+  }
+  const start = gastosEffectiveStartMonth();
+  return MONTH_OFFSETS.map((o) => addMonths(start, o));
+}
+
+function todayISO() { return new Date().toISOString().slice(0, 10); }
+function addDays(dateStr, n) {
+  const d = new Date(dateStr + "T00:00:00");
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+function isAlerta(g) {
+  if (!g.vencimiento || g.pagado) return false;
+  const alertaDesde = addDays(g.vencimiento, -1);
+  return todayISO() >= alertaDesde;
 }
 
 /* ---------- Auth (PIN) ---------- */
@@ -364,27 +443,17 @@ pinInput.addEventListener("keydown", (e) => {
 });
 
 document.getElementById("logout-btn").addEventListener("click", () => {
-  localStorage.removeItem(PIN_STORAGE_KEY);
   currentPin = null;
   unsubs.forEach((u) => u()); unsubs = [];
-  tarjetas = []; compras = []; comisiones = []; empresas = []; sueldos = []; categorias = []; gastos = []; otrosIngresos = []; pagosTarjeta = [];
+  tarjetas = []; compras = []; comisiones = []; empresas = []; sueldos = []; categorias = []; gastos = []; otrosIngresos = []; categoriasIngreso = []; pagosTarjeta = [];
   appScreen.classList.add("hidden");
   loginScreen.classList.remove("hidden");
   pinInput.value = "";
   pinInput.focus();
 });
 
-onAuthStateChanged(auth, async (user) => {
-  const savedPin = localStorage.getItem(PIN_STORAGE_KEY);
-  if (savedPin) {
-    if (!user) await signInAnonymously(auth);
-    enterApp(savedPin);
-  }
-});
-
 function enterApp(pin) {
   currentPin = pin;
-  localStorage.setItem(PIN_STORAGE_KEY, pin);
   loginScreen.classList.add("hidden");
   appScreen.classList.remove("hidden");
   startListening(pin);
@@ -430,10 +499,40 @@ function startListening(pin) {
   unsubs.push(onSnapshot(col("otrosIngresos"), (s) => {
     otrosIngresos = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
   }));
+  unsubs.push(onSnapshot(query(col("categoriasIngreso"), orderBy("nombre")), (s) => {
+    categoriasIngreso = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
+  }));
   unsubs.push(onSnapshot(col("pagosTarjeta"), (s) => {
     pagosTarjeta = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
   }));
+  unsubs.push(onSnapshot(doc(db, "pins", pin, "settings", "general"), (d) => {
+    settings = d.exists() ? d.data() : { mesInicio: null };
+    renderArchiveBar();
+    renderAll();
+  }));
 }
+
+function renderArchiveBar() {
+  const start = gastosEffectiveStartMonth();
+  document.getElementById("archive-label").textContent = "Mostrando desde " + formatMonthShort(start).replace(/^\w/, (c) => c.toUpperCase());
+}
+
+document.getElementById("archive-btn").addEventListener("click", async () => {
+  if (!currentPin) return;
+  const start = gastosEffectiveStartMonth();
+  const nuevoInicio = addMonths(start, 1);
+  await setDoc(doc(db, "pins", currentPin, "settings", "general"), { mesInicio: nuevoInicio }, { merge: true });
+});
+
+document.getElementById("archive-reset-btn").addEventListener("click", async () => {
+  if (!currentPin) return;
+  await setDoc(doc(db, "pins", currentPin, "settings", "general"), { mesInicio: null }, { merge: true });
+});
+
+document.getElementById("ver-archivados-toggle").addEventListener("change", (e) => {
+  showArchivedGastos = e.target.checked;
+  renderGastos();
+});
 
 function renderAll() {
   renderTarjetas();
@@ -453,6 +552,9 @@ document.getElementById("tarjeta-form").addEventListener("submit", async (e) => 
 });
 
 function cuotaMontoForMonth(compra, monthKey) {
+  if (compra.recurrente) {
+    return monthKey >= compra.mesPrimeraCuota ? compra.montoTotal : 0;
+  }
   const cuota = compra.montoTotal / compra.cuotas;
   for (let i = 0; i < compra.cuotas; i++) {
     if (addMonths(compra.mesPrimeraCuota, i) === monthKey) return cuota;
@@ -474,7 +576,7 @@ function tarjetaTotalForMonth(tarjetaId, monthKey) {
 
 function renderTarjetas() {
   const container = document.getElementById("tarjetas-container");
-  const months = monthRange();
+  const months = standardMonthRange();
 
   if (tarjetas.length === 0) {
     container.innerHTML = `<div class="empty-state">Todavía no creaste ninguna tarjeta. Usá el formulario de arriba.</div>`;
@@ -486,14 +588,23 @@ function renderTarjetas() {
     const comprasCard = compras.filter((c) => c.tarjetaId === t.id);
 
     const rows = comprasCard.map((c) => {
-      const cuota = c.montoTotal / c.cuotas;
+      const cuota = c.recurrente ? c.montoTotal : c.montoTotal / c.cuotas;
       const cells = months.map((mk) => {
         const val = cuotaMontoForMonth(c, mk);
         return `<td class="amount ${val ? "" : "muted"}">${val ? money(val) : "—"}</td>`;
       }).join("");
+      const cuotasLabel = c.recurrente ? "DA" : c.cuotas;
+      const subLabel = c.recurrente
+        ? `Débito automático · ${money(cuota)}/mes`
+        : `${money(cuota)} c/u`;
+      const fechaFmt = c.fecha
+        ? new Date(c.fecha + "T00:00:00").toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" })
+        : "—";
       return `
         <tr>
-          <td class="row-label">${escapeHtml(c.detalle)}<br><span style="font-weight:400;font-size:.72rem;color:var(--muted)">${c.cuotas} cuotas de ${money(cuota)}</span></td>
+          <td class="amount muted" style="text-align:left">${fechaFmt}</td>
+          <td class="amount" style="text-align:center;font-weight:600">${cuotasLabel}</td>
+          <td class="row-label">${escapeHtml(c.detalle)}<br><span style="font-weight:400;font-size:.72rem;color:var(--muted)">${subLabel}</span></td>
           ${cells}
           <td class="row-delete"><button data-collection="compras" data-id="${c.id}" aria-label="Eliminar">×</button></td>
         </tr>`;
@@ -501,12 +612,12 @@ function renderTarjetas() {
 
     const comisionCells = months.map((mk) => {
       const val = comisionForMonth(t.id, mk);
-      return `<td class="amount ${val ? "" : "muted"}">${val ? money(val) : "—"}</td>`;
+      return `<td class="amount editable-cell"><input type="number" step="0.01" class="comision-input" data-tarjeta-id="${t.id}" data-month="${mk}" value="${val || ""}" placeholder="0" title="Escribí la comisión cuando la sepas" /></td>`;
     }).join("");
 
     const totalCells = months.map((mk) => `<td class="amount">${money(tarjetaTotalForMonth(t.id, mk))}</td>`).join("");
 
-    const thead = `<tr><th>Detalle</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}<th></th></tr>`;
+    const thead = `<tr><th>Fecha</th><th>Cuotas</th><th>Detalle</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}<th></th></tr>`;
 
     return `
       <div class="group-block">
@@ -517,25 +628,24 @@ function renderTarjetas() {
         <div class="group-body">
           <form class="sub-form compra-form" data-tarjeta-id="${t.id}">
             <div class="sf-field sf-desc"><label>Detalle</label><input type="text" class="c-detalle" placeholder="Ej: Heladera" required /></div>
-            <div class="sf-field sf-num"><label>Monto total</label><input type="number" class="c-total" step="0.01" min="0" required /></div>
-            <div class="sf-field sf-num"><label>Cuotas</label><input type="number" class="c-cuotas" min="1" step="1" required /></div>
-            <div class="sf-field sf-month"><label>1ª cuota</label><input type="month" class="c-mes" value="${currentMonthKey()}" required /></div>
+            <div class="sf-field sf-month"><label>Fecha de compra</label><input type="date" class="c-fecha" value="${new Date().toISOString().slice(0, 10)}" required /></div>
+            <div class="sf-field sf-num"><label class="c-total-label">Monto total</label><input type="number" class="c-total" step="0.01" min="0" required /></div>
+            <div class="sf-field sf-num c-cuotas-field"><label>Cuotas</label><input type="number" class="c-cuotas" min="1" step="1" value="1" required /></div>
+            <div class="sf-field sf-month"><label>1ª cuota / mes desde</label><input type="month" class="c-mes" value="${currentMonthKey()}" required /></div>
+            <div class="sf-field" style="flex-direction:row;align-items:center;gap:.4rem;padding-bottom:.5rem">
+              <input type="checkbox" class="c-recurrente" id="rec-${t.id}" style="width:auto" />
+              <label for="rec-${t.id}" style="text-transform:none;font-size:.78rem;color:var(--ink)">Débito automático (mismo monto todos los meses)</label>
+            </div>
             <button type="submit">+ Agregar compra</button>
-          </form>
-
-          <form class="sub-form comision-form" data-tarjeta-id="${t.id}">
-            <div class="sf-field sf-num"><label>Comisión</label><input type="number" class="cm-monto" step="0.01" min="0" required /></div>
-            <div class="sf-field sf-month"><label>Mes</label><input type="month" class="cm-mes" value="${currentMonthKey()}" required /></div>
-            <button type="submit">+ Agregar comisión</button>
           </form>
 
           <div class="matrix-wrap">
             <table class="matrix-table">
               <thead>${thead}</thead>
               <tbody>
-                ${rows || `<tr><td colspan="${months.length + 2}" class="empty-state">Sin compras cargadas.</td></tr>`}
-                <tr><td class="row-label">Comisión</td>${comisionCells}<td></td></tr>
-                <tr class="total-row"><td class="row-label">Total tarjeta</td>${totalCells}<td></td></tr>
+                ${rows || `<tr><td colspan="${months.length + 4}" class="empty-state">Sin compras cargadas.</td></tr>`}
+                <tr><td></td><td></td><td class="row-label">Comisión</td>${comisionCells}<td></td></tr>
+                <tr class="total-row"><td></td><td></td><td class="row-label">Total tarjeta</td>${totalCells}<td></td></tr>
               </tbody>
             </table>
           </div>
@@ -558,32 +668,55 @@ function renderTarjetas() {
     </div>`;
 
   // Bind sub-forms
+  // Toggle: ocultar "cuotas" y cambiar el label cuando es débito automático
+  container.querySelectorAll(".compra-form").forEach((f) => {
+    const checkbox = f.querySelector(".c-recurrente");
+    const cuotasField = f.querySelector(".c-cuotas-field");
+    const cuotasInput = f.querySelector(".c-cuotas");
+    const totalLabel = f.querySelector(".c-total-label");
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) {
+        cuotasField.style.display = "none";
+        cuotasInput.required = false;
+        totalLabel.textContent = "Monto mensual";
+      } else {
+        cuotasField.style.display = "";
+        cuotasInput.required = true;
+        totalLabel.textContent = "Monto total";
+      }
+    });
+  });
+
   container.querySelectorAll(".compra-form").forEach((f) => {
     f.addEventListener("submit", async (e) => {
       e.preventDefault();
       const tarjetaId = f.dataset.tarjetaId;
       const detalle = f.querySelector(".c-detalle").value.trim();
+      const fecha = f.querySelector(".c-fecha").value;
       const montoTotal = parseFloat(f.querySelector(".c-total").value);
-      const cuotas = parseInt(f.querySelector(".c-cuotas").value, 10);
+      const recurrente = f.querySelector(".c-recurrente").checked;
+      const cuotas = recurrente ? 1 : parseInt(f.querySelector(".c-cuotas").value, 10);
       const mesPrimeraCuota = f.querySelector(".c-mes").value;
-      if (!detalle || !montoTotal || !cuotas || !mesPrimeraCuota) return;
+      if (!detalle || !fecha || !montoTotal || !cuotas || !mesPrimeraCuota) return;
       await addDoc(col("compras"), {
-        tarjetaId, detalle,
-        fecha: new Date().toISOString().slice(0, 10),
-        montoTotal, cuotas, mesPrimeraCuota,
+        tarjetaId, detalle, fecha,
+        montoTotal, cuotas, mesPrimeraCuota, recurrente,
         createdAt: serverTimestamp()
       });
     });
   });
 
-  container.querySelectorAll(".comision-form").forEach((f) => {
-    f.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const tarjetaId = f.dataset.tarjetaId;
-      const monto = parseFloat(f.querySelector(".cm-monto").value);
-      const month = f.querySelector(".cm-mes").value;
-      if (!monto || !month) return;
-      await addDoc(col("comisiones"), { tarjetaId, monto, month, createdAt: serverTimestamp() });
+  container.querySelectorAll(".comision-input").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const tarjetaId = input.dataset.tarjetaId;
+      const month = input.dataset.month;
+      const monto = parseFloat(input.value) || 0;
+      const ref = doc(db, "pins", currentPin, "comisiones", `${tarjetaId}_${month}`);
+      if (!monto) {
+        await deleteDoc(ref).catch(() => {});
+      } else {
+        await setDoc(ref, { tarjetaId, month, monto, createdAt: serverTimestamp() });
+      }
     });
   });
 }
@@ -605,9 +738,30 @@ function pagoHaberesForMonth(empresaId, monthKey) {
     .reduce((sum, s) => sum + (s.pagoHaberes || 0), 0);
 }
 
+const SUELDO_FIELD_DEFS = [
+  { key: "bruto", label: "Bruto" },
+  { key: "neto", label: "Neto sin comedor" },
+  { key: "ninera", label: "Niñera" },
+  { key: "comedor", label: "Comedor" },
+  { key: "periodo", label: "Período trabajado" },
+];
+
+function defaultHiddenFieldsFor(nombre) {
+  const n = (nombre || "").trim().toLowerCase();
+  if (n === "club") return ["neto", "ninera", "comedor"];
+  if (n === "city") return ["neto", "periodo"];
+  return [];
+}
+function camposOcultosFor(emp) {
+  return Array.isArray(emp.camposOcultos) ? emp.camposOcultos : defaultHiddenFieldsFor(emp.nombre);
+}
+async function guardarCamposOcultos(empresaId, camposOcultos) {
+  await setDoc(doc(db, "pins", currentPin, "empresas", empresaId), { camposOcultos }, { merge: true });
+}
+
 function renderSueldo() {
   const container = document.getElementById("empresas-container");
-  const months = monthRange();
+  const months = standardMonthRange();
 
   if (empresas.length === 0) {
     container.innerHTML = `<div class="empty-state">Todavía no creaste ninguna empresa. Usá el formulario de arriba.</div>`;
@@ -624,7 +778,16 @@ function renderSueldo() {
   ];
 
   container.innerHTML = empresas.map((emp) => {
-    const rows = fields.map((f) => {
+    const ocultos = camposOcultosFor(emp);
+    const visibleFields = fields.filter((f) => f.key === "pagoHaberes" || !ocultos.includes(f.key));
+
+    const fieldToggles = SUELDO_FIELD_DEFS.map((f) => `
+      <label style="display:inline-flex;align-items:center;gap:.3rem;font-size:.75rem;color:var(--muted);margin-right:.9rem">
+        <input type="checkbox" class="campo-toggle" data-empresa-id="${emp.id}" data-field="${f.key}" ${ocultos.includes(f.key) ? "" : "checked"} style="width:auto" />
+        ${f.label}
+      </label>`).join("");
+
+    const rows = visibleFields.map((f) => {
       const cells = months.map((mk) => {
         const entries = sueldos.filter((s) => s.empresaId === emp.id && s.mesPago === mk);
         const val = entries.reduce((sum, s) => sum + (s[f.key] || 0), 0);
@@ -651,13 +814,18 @@ function renderSueldo() {
           <button class="group-delete" data-collection="empresas" data-id="${emp.id}">Eliminar empresa</button>
         </div>
         <div class="group-body">
+          <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:var(--paper);border-radius:6px">
+            <span style="font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);display:block;margin-bottom:.35rem">Campos visibles en esta empresa</span>
+            ${fieldToggles}
+          </div>
+
           <form class="sub-form sueldo-form" data-empresa-id="${emp.id}">
             <div class="sf-field sf-month"><label>Mes de pago</label><input type="month" class="s-mes" value="${currentMonthKey()}" required /></div>
-            <div class="sf-field sf-desc" style="flex:0 0 110px"><label>Período trabajado (opcional)</label><input type="text" class="s-periodo" placeholder="Ej: may-26" /></div>
-            <div class="sf-field sf-num"><label>Bruto</label><input type="number" class="s-bruto" step="0.01" min="0" /></div>
-            <div class="sf-field sf-num"><label>Neto s/comedor</label><input type="number" class="s-neto" step="0.01" min="0" /></div>
-            <div class="sf-field sf-num"><label>Niñera</label><input type="number" class="s-ninera" step="0.01" min="0" /></div>
-            <div class="sf-field sf-num"><label>Comedor</label><input type="number" class="s-comedor" step="0.01" min="0" /></div>
+            ${!ocultos.includes("periodo") ? `<div class="sf-field sf-desc" style="flex:0 0 110px"><label>Período trabajado (opcional)</label><input type="text" class="s-periodo" placeholder="Ej: may-26" /></div>` : ""}
+            ${!ocultos.includes("bruto") ? `<div class="sf-field sf-num"><label>Bruto</label><input type="number" class="s-bruto" step="0.01" min="0" /></div>` : ""}
+            ${!ocultos.includes("neto") ? `<div class="sf-field sf-num"><label>Neto s/comedor</label><input type="number" class="s-neto" step="0.01" min="0" /></div>` : ""}
+            ${!ocultos.includes("ninera") ? `<div class="sf-field sf-num"><label>Niñera</label><input type="number" class="s-ninera" step="0.01" min="0" /></div>` : ""}
+            ${!ocultos.includes("comedor") ? `<div class="sf-field sf-num"><label>Comedor</label><input type="number" class="s-comedor" step="0.01" min="0" /></div>` : ""}
             <div class="sf-field sf-num"><label>Pago haberes</label><input type="number" class="s-haberes" step="0.01" min="0" required /></div>
             <button type="submit">+ Agregar sueldo</button>
           </form>
@@ -697,17 +865,34 @@ function renderSueldo() {
       e.preventDefault();
       const empresaId = f.dataset.empresaId;
       const mesPago = f.querySelector(".s-mes").value;
-      const periodoPagado = f.querySelector(".s-periodo").value.trim();
-      const bruto = parseFloat(f.querySelector(".s-bruto").value) || 0;
-      const neto = parseFloat(f.querySelector(".s-neto").value) || 0;
-      const ninera = parseFloat(f.querySelector(".s-ninera").value) || 0;
-      const comedor = parseFloat(f.querySelector(".s-comedor").value) || 0;
+      const periodoEl = f.querySelector(".s-periodo");
+      const periodoPagado = periodoEl ? periodoEl.value.trim() : "";
+      const brutoEl = f.querySelector(".s-bruto");
+      const netoEl = f.querySelector(".s-neto");
+      const nineraEl = f.querySelector(".s-ninera");
+      const comedorEl = f.querySelector(".s-comedor");
+      const bruto = brutoEl ? parseFloat(brutoEl.value) || 0 : 0;
+      const neto = netoEl ? parseFloat(netoEl.value) || 0 : 0;
+      const ninera = nineraEl ? parseFloat(nineraEl.value) || 0 : 0;
+      const comedor = comedorEl ? parseFloat(comedorEl.value) || 0 : 0;
       const pagoHaberes = parseFloat(f.querySelector(".s-haberes").value);
       if (!mesPago || !pagoHaberes) return;
       await addDoc(col("sueldos"), {
         empresaId, mesPago, periodoPagado, bruto, neto, ninera, comedor, pagoHaberes,
         createdAt: serverTimestamp()
       });
+    });
+  });
+
+  container.querySelectorAll(".campo-toggle").forEach((checkbox) => {
+    checkbox.addEventListener("change", async () => {
+      const empresaId = checkbox.dataset.empresaId;
+      const emp = empresas.find((e) => e.id === empresaId);
+      if (!emp) return;
+      const ocultosActuales = new Set(camposOcultosFor(emp));
+      if (checkbox.checked) ocultosActuales.delete(checkbox.dataset.field);
+      else ocultosActuales.add(checkbox.dataset.field);
+      await guardarCamposOcultos(empresaId, Array.from(ocultosActuales));
     });
   });
 }
@@ -723,34 +908,60 @@ document.getElementById("categoria-form").addEventListener("submit", async (e) =
   e.target.reset();
 });
 
-document.getElementById("otro-ingreso-form").addEventListener("submit", async (e) => {
+document.getElementById("categoria-ingreso-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const monto = parseFloat(document.getElementById("oi-monto").value);
-  const month = document.getElementById("oi-mes").value;
-  const nota = document.getElementById("oi-nota").value.trim();
-  if (!monto || !month) return;
-  await addDoc(col("otrosIngresos"), { monto, month, nota, createdAt: serverTimestamp() });
+  const nombre = document.getElementById("categoria-ingreso-nombre").value.trim();
+  if (!nombre || !currentPin) return;
+  await addDoc(col("categoriasIngreso"), { nombre, createdAt: serverTimestamp() });
   e.target.reset();
-  document.getElementById("oi-mes").value = currentMonthKey();
 });
 
-document.getElementById("gasto-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const categoriaId = document.getElementById("gasto-categoria").value;
-  const monto = parseFloat(document.getElementById("gasto-monto").value);
-  const month = document.getElementById("gasto-mes").value;
-  const nota = document.getElementById("gasto-nota").value.trim();
-  if (!categoriaId || !monto || !month) return;
-  await addDoc(col("gastos"), { categoriaId, monto, month, nota, createdAt: serverTimestamp() });
-  e.target.reset();
-  document.getElementById("gasto-mes").value = currentMonthKey();
-});
+// ---- Guardado directo por celda (upsert: una fila = categoría+mes[+moneda]) ----
+function gastoDocId(categoriaId, month, moneda) { return `${categoriaId}_${month}_${moneda}`; }
+function gastoEntryFor(categoriaId, month, moneda) {
+  return gastos.find((g) => g.categoriaId === categoriaId && g.month === month && (g.moneda || "ARS") === moneda) || null;
+}
+async function guardarGastoCelda(categoriaId, month, moneda, patch) {
+  if (!currentPin) return;
+  const ref = doc(db, "pins", currentPin, "gastos", gastoDocId(categoriaId, month, moneda));
+  await setDoc(ref, { categoriaId, month, moneda, ...patch }, { merge: true });
+}
+
+function ingresoDocId(categoriaId, month) { return `${categoriaId}_${month}`; }
+function ingresoEntryFor(categoriaId, month) {
+  return otrosIngresos.find((o) => o.categoriaId === categoriaId && o.month === month) || null;
+}
+async function guardarIngresoCelda(categoriaId, month, monto) {
+  if (!currentPin) return;
+  const ref = doc(db, "pins", currentPin, "otrosIngresos", ingresoDocId(categoriaId, month));
+  if (!monto) {
+    await deleteDoc(ref).catch(() => {});
+  } else {
+    await setDoc(ref, { categoriaId, month, monto }, { merge: true });
+  }
+}
 
 function otrosIngresosForMonth(monthKey) {
   return otrosIngresos.filter((o) => o.month === monthKey).reduce((s, o) => s + o.monto, 0);
 }
+function categoriaIngresoTotalForMonth(categoriaId, monthKey) {
+  return otrosIngresos
+    .filter((o) => o.categoriaId === categoriaId && o.month === monthKey)
+    .reduce((s, o) => s + o.monto, 0);
+}
 function categoriaTotalForMonth(categoriaId, monthKey) {
-  return gastos.filter((g) => g.categoriaId === categoriaId && g.month === monthKey).reduce((s, g) => s + g.monto, 0);
+  return gastos
+    .filter((g) => g.categoriaId === categoriaId && g.month === monthKey && g.moneda !== "USD")
+    .reduce((s, g) => s + g.monto, 0);
+}
+function categoriaTotalUSDForMonth(categoriaId, monthKey) {
+  return gastos
+    .filter((g) => g.categoriaId === categoriaId && g.month === monthKey && g.moneda === "USD")
+    .reduce((s, g) => s + g.monto, 0);
+}
+function moneyUSD(n) {
+  n = n || 0;
+  return "US$ " + n.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 }
 function overrideId(tarjetaId, monthKey) { return `${tarjetaId}_${monthKey}`; }
 function pagoTarjetaOverride(tarjetaId, monthKey) {
@@ -772,16 +983,8 @@ async function guardarPagoTarjeta(tarjetaId, monthKey, monto, montoCalculado) {
 }
 
 function renderGastos() {
-  // populate category select
-  const sel = document.getElementById("gasto-categoria");
-  const prev = sel.value;
-  sel.innerHTML = categorias.map((c) => `<option value="${c.id}">${escapeHtml(c.nombre)}</option>`).join("");
-  if (prev) sel.value = prev;
-
-  if (!document.getElementById("oi-mes").value) document.getElementById("oi-mes").value = currentMonthKey();
-  if (!document.getElementById("gasto-mes").value) document.getElementById("gasto-mes").value = currentMonthKey();
-
-  const months = monthRange();
+  const months = gastosMonthRange();
+  renderArchiveBar();
   const rows = [];
 
   rows.push(`<tr class="section-row"><td class="row-label">Ingresos</td>${months.map(() => "<td></td>").join("")}</tr>`);
@@ -792,11 +995,14 @@ function renderGastos() {
     }).join("");
     rows.push(`<tr><td class="row-label">${escapeHtml(emp.nombre)}</td>${cells}</tr>`);
   });
-  const otrosCells = months.map((mk) => {
-    const v = otrosIngresosForMonth(mk);
-    return `<td class="amount ${v ? "" : "muted"}">${v ? money(v) : "—"}</td>`;
-  }).join("");
-  rows.push(`<tr><td class="row-label">Otros ingresos</td>${otrosCells}</tr>`);
+  categoriasIngreso.forEach((cat) => {
+    const cells = months.map((mk) => {
+      const entry = ingresoEntryFor(cat.id, mk);
+      const monto = entry ? entry.monto || 0 : 0;
+      return `<td class="amount editable-cell"><input type="number" step="0.01" class="ingreso-monto-input" data-cat="${cat.id}" data-month="${mk}" value="${monto || ""}" placeholder="0" /></td>`;
+    }).join("");
+    rows.push(`<tr><td class="row-label">${escapeHtml(cat.nombre)} <button class="row-inline-delete" data-collection="categoriasIngreso" data-id="${cat.id}" title="Eliminar categoría">×</button></td>${cells}</tr>`);
+  });
 
   const ingresosTotalCells = months.map((mk) => {
     const total = empresas.reduce((s, e) => s + pagoHaberesForMonth(e.id, mk), 0) + otrosIngresosForMonth(mk);
@@ -822,10 +1028,23 @@ function renderGastos() {
   rows.push(`<tr class="section-row"><td class="row-label">Gastos</td>${months.map(() => "<td></td>").join("")}</tr>`);
   categorias.forEach((c) => {
     const cells = months.map((mk) => {
-      const v = categoriaTotalForMonth(c.id, mk);
-      return `<td class="amount ${v ? "" : "muted"}">${v ? money(v) : "—"}</td>`;
+      const entry = gastoEntryFor(c.id, mk, "ARS");
+      const monto = entry ? entry.monto || 0 : 0;
+      const vencimiento = entry ? entry.vencimiento || "" : "";
+      const pagado = entry ? !!entry.pagado : false;
+      const alerta = entry ? isAlerta(entry) : false;
+      return `
+        <td class="amount editable-cell gasto-cell ${alerta ? "alert-cell" : ""}">
+          <input type="number" step="0.01" class="gasto-monto-input" data-cat="${c.id}" data-month="${mk}" value="${monto || ""}" placeholder="0" />
+          <div class="gasto-cell-meta">
+            <input type="date" class="gasto-venc-input" data-cat="${c.id}" data-month="${mk}" value="${vencimiento}" title="Vencimiento" />
+            <label class="gasto-pagado-mini" title="Pagado">
+              <input type="checkbox" class="gasto-pagado-input" data-cat="${c.id}" data-month="${mk}" ${pagado ? "checked" : ""} /> pagado
+            </label>
+          </div>
+        </td>`;
     }).join("");
-    rows.push(`<tr><td class="row-label">${escapeHtml(c.nombre)}</td>${cells}</tr>`);
+    rows.push(`<tr><td class="row-label">${escapeHtml(c.nombre)} <button class="row-inline-delete" data-collection="categoriasGasto" data-id="${c.id}" title="Eliminar categoría">×</button></td>${cells}</tr>`);
   });
 
   const gastoTotalCells = months.map((mk) => {
@@ -837,7 +1056,7 @@ function renderGastos() {
 
   const saldoCells = months.map((mk, i) => {
     const ingresos = empresas.reduce((s, e) => s + pagoHaberesForMonth(e.id, mk), 0) + otrosIngresosForMonth(mk);
-    const gastoTotal = gastoTotalCells[i].total; // ya usa pagoTarjetaEfectivo
+    const gastoTotal = gastoTotalCells[i].total;
     const saldo = ingresos - gastoTotal;
     return `<td class="amount ${saldo >= 0 ? "positive" : "negative"}">${money(saldo)}</td>`;
   });
@@ -847,7 +1066,7 @@ function renderGastos() {
   document.getElementById("resumen-table").innerHTML = `<thead>${thead}</thead><tbody>${rows.join("")}</tbody>`;
 
   document.querySelectorAll(".tarjeta-pago-input").forEach((input) => {
-    input.addEventListener("change", async (e) => {
+    input.addEventListener("change", async () => {
       const tarjetaId = input.dataset.tarjetaId;
       const month = input.dataset.month;
       const calculado = parseFloat(input.dataset.calculado);
@@ -856,40 +1075,63 @@ function renderGastos() {
     });
   });
 
-  renderCategoriasList();
+  document.querySelectorAll(".ingreso-monto-input").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const monto = parseFloat(input.value) || 0;
+      await guardarIngresoCelda(input.dataset.cat, input.dataset.month, monto);
+    });
+  });
+
+  document.querySelectorAll(".gasto-monto-input").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const monto = parseFloat(input.value) || 0;
+      await guardarGastoCelda(input.dataset.cat, input.dataset.month, "ARS", { monto });
+    });
+  });
+  document.querySelectorAll(".gasto-venc-input").forEach((input) => {
+    input.addEventListener("change", async () => {
+      await guardarGastoCelda(input.dataset.cat, input.dataset.month, "ARS", { vencimiento: input.value || "" });
+    });
+  });
+  document.querySelectorAll(".gasto-pagado-input").forEach((input) => {
+    input.addEventListener("change", async () => {
+      await guardarGastoCelda(input.dataset.cat, input.dataset.month, "ARS", { pagado: input.checked });
+    });
+  });
+
+  renderResumenUSD(months);
 }
 
-function renderCategoriasList() {
-  const container = document.getElementById("categorias-list");
+function renderResumenUSD(months) {
+  const table = document.getElementById("resumen-usd-table");
   if (categorias.length === 0) {
-    container.innerHTML = `<div class="empty-state">Todavía no creaste ninguna categoría de gasto.</div>`;
+    table.innerHTML = `<tbody><tr><td class="empty-state">Creá primero una categoría de gasto para poder cargar montos en dólares.</td></tr></tbody>`;
     return;
   }
-  container.innerHTML = categorias.map((c) => {
-    const entries = gastos.filter((g) => g.categoriaId === c.id).sort((a, b) => (a.month < b.month ? 1 : -1));
-    const entryRows = entries.map((g) => `
-      <tr>
-        <td class="row-label">${formatMonthShort(g.month)}${g.nota ? ` · ${escapeHtml(g.nota)}` : ""}</td>
-        <td class="amount">${money(g.monto)}</td>
-        <td class="row-delete"><button data-collection="gastos" data-id="${g.id}" aria-label="Eliminar">×</button></td>
-      </tr>`).join("");
-    return `
-      <div class="group-block">
-        <div class="group-header">
-          <h3>${escapeHtml(c.nombre)}</h3>
-          <button class="group-delete" data-collection="categoriasGasto" data-id="${c.id}">Eliminar categoría</button>
-        </div>
-        <div class="group-body">
-          ${entryRows ? `
-          <div class="matrix-wrap">
-            <table class="matrix-table">
-              <thead><tr><th>Mes</th><th>Monto</th><th></th></tr></thead>
-              <tbody>${entryRows}</tbody>
-            </table>
-          </div>` : `<div class="empty-state">Sin gastos cargados en esta categoría.</div>`}
-        </div>
-      </div>`;
+
+  const thead = `<tr><th>Categoría (USD)</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}</tr>`;
+  const rows = categorias.map((c) => {
+    const cells = months.map((mk) => {
+      const entry = gastoEntryFor(c.id, mk, "USD");
+      const monto = entry ? entry.monto || 0 : 0;
+      return `<td class="amount editable-cell"><input type="number" step="0.01" class="gasto-usd-input" data-cat="${c.id}" data-month="${mk}" value="${monto || ""}" placeholder="0" /></td>`;
+    }).join("");
+    return `<tr><td class="row-label">${escapeHtml(c.nombre)}</td>${cells}</tr>`;
   }).join("");
+
+  const totalCells = months.map((mk) => {
+    const total = categorias.reduce((s, c) => s + categoriaTotalUSDForMonth(c.id, mk), 0);
+    return `<td class="amount">${moneyUSD(total)}</td>`;
+  }).join("");
+
+  table.innerHTML = `<thead>${thead}</thead><tbody>${rows}<tr class="total-row"><td class="row-label">Total USD</td>${totalCells}</tr></tbody>`;
+
+  table.querySelectorAll(".gasto-usd-input").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const monto = parseFloat(input.value) || 0;
+      await guardarGastoCelda(input.dataset.cat, input.dataset.month, "USD", { monto });
+    });
+  });
 }
 
 /* ---------- Delegated delete for all lists ---------- */
