@@ -26,7 +26,7 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; -webkit-font-smoothing: antialiased; }
 .hidden { display: none !important; }
 button { font-family: var(--font-body); cursor: pointer; }
 input, select { font-family: var(--font-body); }
@@ -107,10 +107,10 @@ input, select { font-family: var(--font-body); }
 /* ===== App shell ===== */
 #app-screen { max-width: 100%; margin: 0; }
 .topbar { display: flex; align-items: center; gap: 1.5rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--paper-line); background: var(--white); flex-wrap: wrap; position: sticky; top: 0; z-index: 10; }
-.topbar .brand { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; flex-shrink: 0; }
+.topbar .brand { font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; flex-shrink: 0; }
 .topbar .brand span { border-bottom: 2px solid var(--gold); }
 .tabs { display: flex; gap: .4rem; flex: 1; overflow-x: auto; }
-.tab-btn { padding: .5rem 1rem; border: none; background: transparent; border-radius: 6px; font-size: .87rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.tab-btn { padding: .6rem 1.2rem; border: none; background: transparent; border-radius: 8px; font-size: .95rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
 .tab-btn:hover { background: var(--paper); color: var(--ink); }
 .tab-btn.active { background: var(--ink); color: var(--white); }
 #logout-btn { background: none; border: none; color: var(--muted); font-size: .78rem; text-decoration: underline; flex-shrink: 0; }
@@ -121,14 +121,14 @@ input, select { font-family: var(--font-body); }
   justify-content: space-between;
   gap: .75rem;
   flex-wrap: wrap;
-  padding: .6rem 1.25rem;
+  padding: .75rem 1.25rem;
   background: var(--gold-soft);
   border-bottom: 1px solid var(--paper-line);
-  font-size: .8rem;
+  font-size: .88rem;
 }
-.archive-bar #archive-label { color: var(--ink); font-weight: 600; text-transform: capitalize; }
+.archive-bar #archive-label { color: var(--ink); font-weight: 700; text-transform: capitalize; font-size: .92rem; }
 .archive-actions { display: flex; gap: .6rem; align-items: center; }
-#archive-reset-btn { background: none; border: none; color: var(--muted); font-size: .76rem; text-decoration: underline; }
+#archive-reset-btn { background: none; border: none; color: var(--muted); font-size: .82rem; text-decoration: underline; }
 #archive-btn { padding: .4rem .8rem; font-size: .78rem; }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
@@ -136,14 +136,14 @@ input, select { font-family: var(--font-body); }
 /* ===== Mini forms (add tarjeta / empresa / categoria) ===== */
 .mini-form-bar { margin-bottom: 1rem; }
 .mini-form { display: flex; gap: .5rem; flex-wrap: wrap; }
-.mini-form input { flex: 1; min-width: 180px; padding: .55rem .7rem; border: 1px solid var(--paper-line); border-radius: 6px; font-size: .88rem; background: var(--white); color: var(--ink); }
+.mini-form input { flex: 1; min-width: 180px; padding: .65rem .8rem; border: 1px solid var(--paper-line); border-radius: 8px; font-size: .95rem; background: var(--white); color: var(--ink); box-shadow: inset 0 1px 2px rgba(28,37,65,.05); }
 .mini-form input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
-.btn-secondary { padding: .55rem 1rem; background: var(--white); border: 1px solid var(--ink); color: var(--ink); border-radius: 6px; font-size: .83rem; font-weight: 600; white-space: nowrap; }
+.btn-secondary { padding: .65rem 1.2rem; background: var(--white); border: 1px solid var(--ink); color: var(--ink); border-radius: 8px; font-size: .9rem; font-weight: 600; white-space: nowrap; box-shadow: 0 1px 3px rgba(28,37,65,.08); }
 .btn-secondary:hover { background: var(--ink); color: var(--white); }
 
 /* ===== Card blocks (tarjeta / empresa groups) ===== */
-.group-block { background: var(--white); border: 1px solid var(--paper-line); border-radius: 8px; margin-bottom: 1.25rem; overflow: hidden; }
-.group-header { display: flex; align-items: center; justify-content: space-between; padding: .8rem 1rem; background: var(--ink); color: var(--white); }
+.group-block { background: var(--white); border: 1px solid var(--paper-line); border-radius: 10px; margin-bottom: 1.4rem; overflow: hidden; box-shadow: 0 2px 10px rgba(28,37,65,.09); }
+.group-header { display: flex; align-items: center; justify-content: space-between; padding: .9rem 1.1rem; background: var(--ink); color: var(--white); box-shadow: inset 0 -2px 0 rgba(0,0,0,.15); }
 .group-header h3 { font-family: var(--font-display); font-size: 1.02rem; margin: 0; }
 .group-delete { background: none; border: none; color: #a9b0c9; font-size: .78rem; text-decoration: underline; }
 .group-delete:hover { color: var(--white); }
@@ -152,14 +152,14 @@ input, select { font-family: var(--font-body); }
 .sub-form { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .9rem; align-items: flex-end; }
 .sub-form .sf-field { display: flex; flex-direction: column; gap: .25rem; }
 .sub-form .sf-field label { font-size: .66rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
-.sub-form input, .sub-form select { padding: .5rem .6rem; border: 1px solid var(--paper-line); border-radius: 6px; font-size: .85rem; background: var(--paper); color: var(--ink); }
+.sub-form input, .sub-form select { padding: .6rem .7rem; border: 1px solid var(--paper-line); border-radius: 6px; font-size: .92rem; background: var(--paper); color: var(--ink); }
 .sub-form .sf-desc { flex: 1; min-width: 140px; }
 .sub-form .sf-num { width: 100px; }
 .sub-form .sf-month { width: 130px; }
 .sub-form button { padding: .5rem 1rem; background: var(--gold); border: none; color: var(--white); border-radius: 6px; font-size: .82rem; font-weight: 600; }
 
 /* ===== Matrix tables ===== */
-.matrix-wrap { overflow-x: auto; margin-bottom: .5rem; border: 1px solid var(--paper-line); border-radius: 8px; }
+.matrix-wrap { overflow-x: auto; margin-bottom: .5rem; border: 1px solid var(--paper-line); border-radius: 10px; box-shadow: 0 2px 8px rgba(28,37,65,.07); }
 .matrix-table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: .95rem; }
 .matrix-table th, .matrix-table td { padding: .65rem .8rem; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--paper-line); }
 .matrix-table th:first-child, .matrix-table td:first-child { text-align: left; position: sticky; left: 0; background: inherit; min-width: 160px; }
@@ -169,12 +169,25 @@ input, select { font-family: var(--font-body); }
 .matrix-table tbody tr:nth-child(odd) { background: var(--white); }
 .matrix-table td.row-label { font-weight: 600; }
 .matrix-table td.amount { font-family: var(--font-mono); }
-.matrix-table tr.total-row td { font-weight: 700; background: var(--gold-soft) !important; border-top: 2px solid var(--gold); }
+.matrix-table tr.total-row td {
+  font-weight: 700;
+  font-size: 1.05rem;
+  background: var(--gold-soft) !important;
+  border-top: 2px solid var(--gold);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+  padding-top: .8rem;
+  padding-bottom: .8rem;
+}
 .matrix-table tr.total-row td.row-label { color: var(--ink); }
-.matrix-table tr.saldo-row td { font-weight: 700; font-size: .9rem; }
-.matrix-table tr.saldo-row td.amount.positive { color: var(--income); background: var(--income-soft) !important; }
-.matrix-table tr.saldo-row td.amount.negative { color: var(--expense); background: var(--expense-soft) !important; }
-.matrix-table tr.section-row td { background: var(--ink-soft) !important; color: var(--white); font-weight: 600; font-size: .76rem; text-transform: uppercase; letter-spacing: .04em; }
+.matrix-table tr.saldo-row td {
+  font-weight: 800;
+  font-size: 1.15rem;
+  padding-top: .9rem;
+  padding-bottom: .9rem;
+}
+.matrix-table tr.saldo-row td.amount.positive { color: var(--income); background: var(--income-soft) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.7); }
+.matrix-table tr.saldo-row td.amount.negative { color: var(--expense); background: var(--expense-soft) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.7); }
+.matrix-table tr.section-row td { background: var(--ink-soft) !important; color: var(--white); font-weight: 700; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; }
 .matrix-table tr.alert-row td { background: var(--expense-soft) !important; color: var(--expense); font-weight: 700; }
 .matrix-table tr.row-otro td { background: #f0ecf9 !important; }
 .matrix-table tr.row-otro td.row-label { border-left: 3px solid #8a6fc9; }
@@ -246,6 +259,43 @@ input, select { font-family: var(--font-body); }
   vertical-align: middle;
 }
 .row-inline-delete:hover { color: var(--expense); }
+
+/* ===== Columna final "Vence / Cobra" ===== */
+.matrix-table th.dia-col-header {
+  background: var(--gold);
+  color: var(--white);
+  text-align: center;
+  font-size: .78rem;
+}
+.matrix-table td.dia-col {
+  text-align: center;
+  background: var(--white) !important;
+  padding: .5rem .6rem;
+}
+.dia-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(160deg, var(--white), var(--paper));
+  border: 1px solid var(--gold);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 2px 5px rgba(28,37,65,.15);
+}
+.dia-input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+.dia-input:focus { outline: none; }
+.dia-input::placeholder { color: var(--paper-line); font-weight: 400; }
 .matrix-table td.muted { color: var(--muted); }
 .matrix-table td.row-delete { text-align: center; width: 32px; }
 .matrix-table td.row-delete button { background: none; border: none; color: var(--paper-line); font-size: 1rem; }
@@ -273,11 +323,11 @@ input, select { font-family: var(--font-body); }
 .section-divider { font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin: 1.75rem 0 .75rem; padding-bottom: .4rem; border-bottom: 2px solid var(--gold); }
 
 /* ===== Generic add-card form (used in Gastos) ===== */
-.add-card { background: var(--white); border: 1px solid var(--paper-line); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+.add-card { background: var(--white); border: 1px solid var(--paper-line); border-radius: 10px; padding: 1.1rem; margin-bottom: 1.1rem; box-shadow: 0 2px 8px rgba(28,37,65,.07); }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
 .form-grid .full { grid-column: 1 / -1; }
-.form-grid label { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: .3rem; }
-.form-grid input, .form-grid select { width: 100%; padding: .55rem .6rem; border: 1px solid var(--paper-line); border-radius: 6px; font-size: .9rem; background: var(--paper); color: var(--ink); }
+.form-grid label { display: block; font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: .35rem; font-weight: 600; }
+.form-grid input, .form-grid select { width: 100%; padding: .65rem .75rem; border: 1px solid var(--paper-line); border-radius: 8px; font-size: 1rem; background: var(--paper); color: var(--ink); }
 
 .empty-state { text-align: center; color: var(--muted); font-size: .85rem; padding: 1.5rem 1rem; }
 
@@ -1367,22 +1417,29 @@ function renderGastos() {
   renderArchiveBar();
   const rows = [];
 
-  rows.push(`<tr class="section-row"><td class="row-label">Ingresos</td>${months.map(() => "<td></td>").join("")}</tr>`);
+  const diaCell = (value, docCollection, docId) => `
+    <td class="dia-col">
+      <div class="dia-box">
+        <input type="number" min="1" max="31" class="dia-input" data-collection="${docCollection}" data-id="${docId}" value="${value || ""}" placeholder="—" />
+      </div>
+    </td>`;
+
+  rows.push(`<tr class="section-row"><td class="row-label">Ingresos</td>${months.map(() => "<td></td>").join("")}<td></td></tr>`);
   empresas.forEach((emp) => {
     const cells = months.map((mk) => {
       const v = pagoHaberesForMonth(emp.id, mk);
       return `<td class="amount ${v ? "" : "muted"}">${v ? money(v) : "—"}</td>`;
     }).join("");
-    rows.push(`<tr><td class="row-label">${escapeHtml(emp.nombre)}</td>${cells}</tr>`);
+    rows.push(`<tr><td class="row-label">${escapeHtml(emp.nombre)}</td>${cells}${diaCell(emp.diaCobro, "empresas", emp.id)}</tr>`);
   });
 
   const ingresosTotalCells = months.map((mk) => {
     const total = empresas.reduce((s, e) => s + pagoHaberesForMonth(e.id, mk), 0) + otrosIngresosForMonth(mk);
     return `<td class="amount">${money(total)}</td>`;
   });
-  rows.push(`<tr class="total-row"><td class="row-label">Ingresos total</td>${ingresosTotalCells.join("")}</tr>`);
+  rows.push(`<tr class="total-row"><td class="row-label">Ingresos total</td>${ingresosTotalCells.join("")}<td></td></tr>`);
 
-  rows.push(`<tr class="section-row"><td class="row-label">Tarjetas</td>${months.map(() => "<td></td>").join("")}</tr>`);
+  rows.push(`<tr class="section-row"><td class="row-label">Tarjetas</td>${months.map(() => "<td></td>").join("")}<td></td></tr>`);
   tarjetas.forEach((t) => {
     const cells = months.map((mk) => {
       const calculado = tarjetaTotalForMonth(t.id, mk);
@@ -1394,29 +1451,17 @@ function renderGastos() {
           value="${valor || ""}" placeholder="0" title="${override ? "Editado a mano — distinto al total de cuotas" : "Calculado automáticamente. Cambialo si vas a pagar otro monto."}" />
       </td>`;
     }).join("");
-    rows.push(`<tr><td class="row-label">${escapeHtml(t.nombre)}</td>${cells}</tr>`);
+    rows.push(`<tr><td class="row-label">${escapeHtml(t.nombre)}</td>${cells}${diaCell(t.diaVencimiento, "tarjetas", t.id)}</tr>`);
   });
 
-  rows.push(`<tr class="section-row"><td class="row-label">Gastos</td>${months.map(() => "<td></td>").join("")}</tr>`);
+  rows.push(`<tr class="section-row"><td class="row-label">Gastos</td>${months.map(() => "<td></td>").join("")}<td></td></tr>`);
   categorias.forEach((c) => {
     const cells = months.map((mk) => {
       const entry = gastoEntryFor(c.id, mk, "ARS");
       const monto = entry ? entry.monto || 0 : 0;
-      const vencimiento = entry ? entry.vencimiento || "" : "";
-      const pagado = entry ? !!entry.pagado : false;
-      const alerta = entry ? isAlerta(entry) : false;
-      return `
-        <td class="amount editable-cell gasto-cell ${alerta ? "alert-cell" : ""}">
-          <input type="number" step="0.01" class="gasto-monto-input" data-cat="${c.id}" data-month="${mk}" value="${monto || ""}" placeholder="0" />
-          <div class="gasto-cell-meta">
-            <input type="date" class="gasto-venc-input" data-cat="${c.id}" data-month="${mk}" value="${vencimiento}" title="Vencimiento" />
-            <label class="gasto-pagado-mini" title="Pagado">
-              <input type="checkbox" class="gasto-pagado-input" data-cat="${c.id}" data-month="${mk}" ${pagado ? "checked" : ""} /> pagado
-            </label>
-          </div>
-        </td>`;
+      return `<td class="amount editable-cell"><input type="number" step="0.01" class="gasto-monto-input" data-cat="${c.id}" data-month="${mk}" value="${monto || ""}" placeholder="0" /></td>`;
     }).join("");
-    rows.push(`<tr><td class="row-label">${escapeHtml(c.nombre)} <button class="row-inline-delete" data-collection="categoriasGasto" data-id="${c.id}" title="Eliminar categoría">×</button></td>${cells}</tr>`);
+    rows.push(`<tr><td class="row-label">${escapeHtml(c.nombre)} <button class="row-inline-delete" data-collection="categoriasGasto" data-id="${c.id}" title="Eliminar categoría">×</button></td>${cells}${diaCell(c.diaVencimiento, "categoriasGasto", c.id)}</tr>`);
   });
 
   const gastoTotalCells = months.map((mk) => {
@@ -1424,7 +1469,7 @@ function renderGastos() {
     const categoriasTotal = categorias.reduce((s, c) => s + categoriaTotalForMonth(c.id, mk), 0);
     return { mk, total: tarjetasTotal + categoriasTotal };
   });
-  rows.push(`<tr class="total-row"><td class="row-label">Gasto total</td>${gastoTotalCells.map((g) => `<td class="amount">${money(g.total)}</td>`).join("")}</tr>`);
+  rows.push(`<tr class="total-row"><td class="row-label">Gasto total</td>${gastoTotalCells.map((g) => `<td class="amount">${money(g.total)}</td>`).join("")}<td></td></tr>`);
 
   const saldoCells = months.map((mk, i) => {
     const ingresos = empresas.reduce((s, e) => s + pagoHaberesForMonth(e.id, mk), 0) + otrosIngresosForMonth(mk);
@@ -1432,9 +1477,9 @@ function renderGastos() {
     const saldo = ingresos - gastoTotal;
     return `<td class="amount ${saldo >= 0 ? "positive" : "negative"}">${money(saldo)}</td>`;
   });
-  rows.push(`<tr class="saldo-row"><td class="row-label">Saldo</td>${saldoCells.join("")}</tr>`);
+  rows.push(`<tr class="saldo-row"><td class="row-label">Saldo</td>${saldoCells.join("")}<td></td></tr>`);
 
-  const thead = `<tr><th>Concepto</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}</tr>`;
+  const thead = `<tr><th>Concepto</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}<th class="dia-col-header">Vence / Cobra</th></tr>`;
   document.getElementById("resumen-table").innerHTML = `<thead>${thead}</thead><tbody>${rows.join("")}</tbody>`;
 
   document.querySelectorAll(".tarjeta-pago-input").forEach((input) => {
@@ -1453,14 +1498,12 @@ function renderGastos() {
       await guardarGastoCelda(input.dataset.cat, input.dataset.month, "ARS", { monto });
     });
   });
-  document.querySelectorAll(".gasto-venc-input").forEach((input) => {
+
+  document.querySelectorAll(".dia-input").forEach((input) => {
     input.addEventListener("change", async () => {
-      await guardarGastoCelda(input.dataset.cat, input.dataset.month, "ARS", { vencimiento: input.value || "" });
-    });
-  });
-  document.querySelectorAll(".gasto-pagado-input").forEach((input) => {
-    input.addEventListener("change", async () => {
-      await guardarGastoCelda(input.dataset.cat, input.dataset.month, "ARS", { pagado: input.checked });
+      const dia = parseInt(input.value, 10);
+      const field = input.dataset.collection === "empresas" ? "diaCobro" : "diaVencimiento";
+      await updateDoc(doc(db, "pins", currentPin, input.dataset.collection, input.dataset.id), { [field]: isNaN(dia) ? null : dia });
     });
   });
 }
