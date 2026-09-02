@@ -105,7 +105,7 @@ input, select { font-family: var(--font-body); }
 .auth-error { color: var(--expense); font-size: .82rem; text-align: center; min-height: 1.2em; margin: .6rem 0; }
 
 /* ===== App shell ===== */
-#app-screen { max-width: 1100px; margin: 0 auto; }
+#app-screen { max-width: 100%; margin: 0; }
 .topbar { display: flex; align-items: center; gap: 1.5rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--paper-line); background: var(--white); flex-wrap: wrap; position: sticky; top: 0; z-index: 10; }
 .topbar .brand { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; flex-shrink: 0; }
 .topbar .brand span { border-bottom: 2px solid var(--gold); }
@@ -160,10 +160,10 @@ input, select { font-family: var(--font-body); }
 
 /* ===== Matrix tables ===== */
 .matrix-wrap { overflow-x: auto; margin-bottom: .5rem; border: 1px solid var(--paper-line); border-radius: 8px; }
-.matrix-table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: .82rem; }
-.matrix-table th, .matrix-table td { padding: .5rem .65rem; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--paper-line); }
+.matrix-table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: .95rem; }
+.matrix-table th, .matrix-table td { padding: .65rem .8rem; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--paper-line); }
 .matrix-table th:first-child, .matrix-table td:first-child { text-align: left; position: sticky; left: 0; background: inherit; min-width: 160px; }
-.matrix-table thead th { background: var(--ink); color: var(--white); font-weight: 600; text-transform: capitalize; font-size: .78rem; }
+.matrix-table thead th { background: var(--ink); color: var(--white); font-weight: 600; text-transform: capitalize; font-size: .85rem; }
 .matrix-table thead th:first-child { background: var(--ink); }
 .matrix-table tbody tr:nth-child(even) { background: var(--paper); }
 .matrix-table tbody tr:nth-child(odd) { background: var(--white); }
@@ -181,6 +181,25 @@ input, select { font-family: var(--font-body); }
 .matrix-table tr.row-usd td { background: var(--income-soft) !important; }
 .matrix-table tr.row-usd td.row-label { border-left: 3px solid var(--income); }
 .cuota-input.cuota-usd { color: var(--income); font-weight: 700; }
+.cuota-input,
+.gasto-monto-input,
+.ingreso-extra-input,
+.sueldo-field-input {
+  width: 100%;
+  min-width: 90px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: .95rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink);
+  padding: .35rem .4rem;
+  border-radius: 4px;
+}
+.cuota-input:hover, .gasto-monto-input:hover, .ingreso-extra-input:hover, .sueldo-field-input:hover { border-color: var(--paper-line); }
+.cuota-input:focus, .gasto-monto-input:focus, .ingreso-extra-input:focus, .sueldo-field-input:focus { outline: none; border-color: var(--gold); background: var(--white); }
+.cuota-input.edited { color: var(--gold); font-weight: 700; border-bottom: 1px dashed var(--gold); }
 .matrix-table td.negative-cell input,
 .matrix-table td.negative-cell { color: var(--expense) !important; font-weight: 700; }
 .pagado-toggle { background: none; border: 1px solid var(--paper-line); border-radius: 5px; width: 26px; height: 26px; font-size: .85rem; color: var(--income); }
@@ -234,14 +253,15 @@ input, select { font-family: var(--font-body); }
 
 .matrix-table td.editable-cell { padding: .3rem .4rem; }
 .tarjeta-pago-input, .comision-input {
-  width: 90px;
+  width: 100px;
   text-align: right;
   font-family: var(--font-mono);
-  font-size: .82rem;
+  font-size: .95rem;
+  font-weight: 600;
   border: 1px solid transparent;
   background: transparent;
   color: var(--ink);
-  padding: .3rem .35rem;
+  padding: .35rem .4rem;
   border-radius: 4px;
 }
 .tarjeta-pago-input:hover, .comision-input:hover { border-color: var(--paper-line); }
@@ -360,6 +380,7 @@ input, select { font-family: var(--font-body); }
       <div class="matrix-wrap">
         <table class="matrix-table" id="ingresos-extra-table"></table>
       </div>
+      <div id="ingresos-extra-detalle"></div>
     </section>
 
     <!-- ===================== GASTOS ===================== -->
@@ -770,40 +791,32 @@ function renderTarjetas() {
           : cuotaMontoForMonth(c, mk);
         const valor = cuotaMontoEfectivo(c, mk);
         return `<td class="amount editable-cell">
-          ${esUSD ? '<span style="font-size:.62rem;color:var(--income);font-weight:700">US$</span>' : ""}
+          ${esUSD ? '<span style="font-size:.68rem;color:var(--income);font-weight:700">US$</span>' : ""}
           <input type="number" step="0.01" class="cuota-input ${override ? "edited" : ""} ${esUSD ? "cuota-usd" : ""}"
             data-compra-id="${c.id}" data-month="${mk}" data-calculado="${calculado}"
             value="${valor || ""}" placeholder="0" title="${override ? (c.recurrente ? "Editado — se copia a los meses siguientes" : "Editado a mano") : "Calculado automáticamente"}" />
         </td>`;
       }).join("");
       const cuotasCell = c.recurrente
-        ? `<span style="font-weight:600;font-size:.78rem">DA</span>`
-        : `<input type="number" class="compra-edit" data-id="${c.id}" data-field="cuotas" min="1" step="1" value="${c.cuotas}" style="width:44px;text-align:center;border:1px solid var(--paper-line);border-radius:4px;padding:.15rem" />`;
+        ? `<span style="font-weight:600;font-size:.92rem">DA</span>`
+        : `<input type="number" class="compra-edit" data-id="${c.id}" data-field="cuotas" min="1" step="1" value="${c.cuotas}" style="width:50px;text-align:center;border:1px solid var(--paper-line);border-radius:4px;padding:.2rem;font-size:.92rem" />`;
       return `
         <tr class="${c.esOtro ? "row-otro" : ""} ${esUSD ? "row-usd" : ""}">
           <td class="amount" style="text-align:left">
-            <input type="date" class="compra-edit" data-id="${c.id}" data-field="fecha" value="${c.fecha || ""}" style="border:1px solid var(--paper-line);border-radius:4px;padding:.15rem .2rem;font-size:.76rem;width:110px" />
+            <input type="date" class="compra-edit" data-id="${c.id}" data-field="fecha" value="${c.fecha || ""}" style="border:1px solid var(--paper-line);border-radius:4px;padding:.2rem .25rem;font-size:.88rem;width:120px" />
           </td>
           <td class="amount" style="text-align:center">
-            <input type="number" step="0.01" min="0" class="compra-edit" data-id="${c.id}" data-field="montoTotal" value="${c.montoTotal}" style="width:90px;text-align:right;border:1px solid var(--paper-line);border-radius:4px;padding:.15rem .3rem;font-family:var(--font-mono);font-size:.78rem" />
+            <input type="number" step="0.01" min="0" class="compra-edit" data-id="${c.id}" data-field="montoTotal" value="${c.montoTotal}" style="width:100px;text-align:right;border:1px solid var(--paper-line);border-radius:4px;padding:.2rem .35rem;font-family:var(--font-mono);font-size:.9rem;font-weight:600" />
           </td>
           <td class="amount" style="text-align:center">${cuotasCell}</td>
           <td class="row-label">
-            <input type="text" class="compra-edit" data-id="${c.id}" data-field="detalle" value="${escapeHtml(c.detalle)}" style="width:100%;border:none;background:transparent;font-weight:600;font-family:inherit;font-size:.88rem;padding:.1rem 0;color:var(--ink)" />
+            <input type="text" class="compra-edit" data-id="${c.id}" data-field="detalle" value="${escapeHtml(c.detalle)}" style="width:100%;border:none;background:transparent;font-weight:600;font-family:inherit;font-size:.95rem;padding:.15rem 0;color:var(--ink)" />
           </td>
-          <td class="amount" style="text-align:left;padding:.3rem .4rem">
-            <div style="display:flex;flex-direction:column;gap:.25rem">
-              <select class="compra-edit compra-moneda-select" data-id="${c.id}" data-field="moneda" style="font-size:.66rem;border:1px solid var(--paper-line);border-radius:4px;padding:.1rem .2rem;color:${esUSD ? "var(--income)" : "var(--ink)"};font-weight:${esUSD ? "700" : "400"}">
-                <option value="ARS" ${!esUSD ? "selected" : ""}>Pesos</option>
-                <option value="USD" ${esUSD ? "selected" : ""}>USD</option>
-              </select>
-              <label style="font-size:.66rem;color:var(--muted);display:inline-flex;align-items:center;gap:.2rem;white-space:nowrap">
-                <input type="checkbox" class="compra-recurrente-toggle" data-id="${c.id}" ${c.recurrente ? "checked" : ""} style="width:auto" /> Débito auto.
-              </label>
-              <label style="font-size:.66rem;color:var(--gold);font-weight:600;display:inline-flex;align-items:center;gap:.2rem;white-space:nowrap">
-                <input type="checkbox" class="compra-otro-toggle" data-id="${c.id}" ${c.esOtro ? "checked" : ""} style="width:auto" /> Adicional/Otros
-              </label>
-            </div>
+          <td class="amount" style="text-align:center">
+            <select class="compra-edit compra-moneda-select" data-id="${c.id}" data-field="moneda" style="font-size:.82rem;border:1px solid var(--paper-line);border-radius:4px;padding:.2rem .3rem;color:${esUSD ? "var(--income)" : "var(--ink)"};font-weight:${esUSD ? "700" : "400"}">
+              <option value="ARS" ${!esUSD ? "selected" : ""}>Pesos</option>
+              <option value="USD" ${esUSD ? "selected" : ""}>USD</option>
+            </select>
           </td>
           ${cells}
           <td class="row-delete"><button data-collection="compras" data-id="${c.id}" aria-label="Eliminar">×</button></td>
@@ -828,16 +841,16 @@ function renderTarjetas() {
           <button class="group-delete" data-collection="tarjetas" data-id="${t.id}">Eliminar tarjeta</button>
         </div>
         <div class="group-body">
-          <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:var(--paper);border-radius:6px;font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">
-            <span>El vencimiento cae</span>
-            <input type="number" min="0" step="1" class="vencimiento-offset-input" data-tarjeta-id="${t.id}" value="${tarjetaVencimientoOffset(t.id)}" style="width:46px;text-align:center;border:1px solid var(--paper-line);border-radius:4px;padding:.15rem" />
-            <span>mes(es) después de la cuota que cargues abajo (por defecto 1 — ej: cuota de septiembre vence en octubre).</span>
-          </div>
-
-          <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:var(--income-soft);border-radius:6px;font-size:.78rem;color:var(--income);display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;font-weight:600">
-            <span>Cotización USD:</span>
-            <input type="number" min="0" step="0.01" class="cotizacion-input" data-tarjeta-id="${t.id}" value="${cotizacion || ""}" placeholder="Ej: 1450" style="width:90px;text-align:center;border:1px solid var(--income);border-radius:4px;padding:.15rem;font-weight:600;color:var(--income)" />
-            <span style="font-weight:400">$ por USD — se usa para sumar las compras en dólares al total de la tarjeta, todo en pesos.</span>
+          <div style="margin-bottom:.7rem;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap">
+            <span style="display:inline-flex;align-items:center;gap:.35rem;font-size:.76rem;color:var(--muted)">
+              Vencimiento: cuota +
+              <input type="number" min="0" step="1" class="vencimiento-offset-input" data-tarjeta-id="${t.id}" value="${tarjetaVencimientoOffset(t.id)}" style="width:40px;text-align:center;border:1px solid var(--paper-line);border-radius:4px;padding:.15rem" />
+              mes(es)
+            </span>
+            <span style="display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--income);font-weight:600">
+              USD:
+              <input type="number" min="0" step="0.01" class="cotizacion-input" data-tarjeta-id="${t.id}" value="${cotizacion || ""}" placeholder="0" style="width:80px;text-align:center;border:1px solid var(--income);border-radius:4px;padding:.15rem;font-weight:600;color:var(--income)" />
+            </span>
           </div>
 
           <form class="sub-form compra-form" data-tarjeta-id="${t.id}">
@@ -856,6 +869,10 @@ function renderTarjetas() {
             <div class="sf-field" style="flex-direction:row;align-items:center;gap:.4rem;padding-bottom:.5rem">
               <input type="checkbox" class="c-recurrente" id="rec-${t.id}" style="width:auto" />
               <label for="rec-${t.id}" style="text-transform:none;font-size:.78rem;color:var(--ink)">Débito automático (mismo monto todos los meses)</label>
+            </div>
+            <div class="sf-field" style="flex-direction:row;align-items:center;gap:.4rem;padding-bottom:.5rem">
+              <input type="checkbox" class="c-otro" id="otro-${t.id}" style="width:auto" />
+              <label for="otro-${t.id}" style="text-transform:none;font-size:.78rem;color:var(--gold);font-weight:600">Adicional/Otros (no es mío)</label>
             </div>
             <button type="submit">+ Agregar compra</button>
           </form>
@@ -919,10 +936,11 @@ function renderTarjetas() {
       const cuotas = recurrente ? 1 : parseInt(f.querySelector(".c-cuotas").value, 10);
       const mesPrimeraCuota = f.querySelector(".c-mes").value;
       const moneda = f.querySelector(".c-moneda").value;
+      const esOtro = f.querySelector(".c-otro").checked;
       if (!detalle || !fecha || !montoTotal || !cuotas || !mesPrimeraCuota) return;
       await addDoc(col("compras"), {
         tarjetaId, detalle, fecha,
-        montoTotal, cuotas, mesPrimeraCuota, recurrente, moneda,
+        montoTotal, cuotas, mesPrimeraCuota, recurrente, moneda, esOtro,
         createdAt: serverTimestamp()
       });
     });
@@ -975,20 +993,6 @@ function renderTarjetas() {
       if (field === "montoTotal") value = parseFloat(value) || 0;
       if (field === "cuotas") value = parseInt(value, 10) || 1;
       await updateDoc(doc(db, "pins", currentPin, "compras", input.dataset.id), { [field]: value });
-    });
-  });
-
-  // Toggle Débito automático
-  container.querySelectorAll(".compra-recurrente-toggle").forEach((cb) => {
-    cb.addEventListener("change", async () => {
-      await updateDoc(doc(db, "pins", currentPin, "compras", cb.dataset.id), { recurrente: cb.checked });
-    });
-  });
-
-  // Toggle Adicional/Otros
-  container.querySelectorAll(".compra-otro-toggle").forEach((cb) => {
-    cb.addEventListener("change", async () => {
-      await updateDoc(doc(db, "pins", currentPin, "compras", cb.dataset.id), { esOtro: cb.checked });
     });
   });
 
@@ -1196,19 +1200,18 @@ function renderIngresosExtra(months) {
   const table = document.getElementById("ingresos-extra-table");
   if (categoriasIngreso.length === 0) {
     table.innerHTML = `<tbody><tr><td class="empty-state">Todavía no creaste ninguna categoría. Usá el formulario de arriba (ej: "Papá", "Flor", "Adelanto").</td></tr></tbody>`;
+    document.getElementById("ingresos-extra-detalle").innerHTML = "";
     return;
   }
 
-  const thead = `<tr><th>Categoría</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}<th></th></tr>`;
+  const thead = `<tr><th>Categoría</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}</tr>`;
 
   const rows = categoriasIngreso.map((cat) => {
     const cells = months.map((mk) => {
-      const entry = ingresoEntryFor(cat.id, mk);
-      const monto = entry ? entry.monto || 0 : 0;
-      const negClass = monto < 0 ? "negative-cell" : "";
-      return `<td class="amount editable-cell ${negClass}"><input type="number" step="0.01" class="ingreso-extra-input" data-cat="${cat.id}" data-month="${mk}" value="${monto || ""}" placeholder="0" /></td>`;
+      const total = categoriaIngresoTotalForMonth(cat.id, mk);
+      return `<td class="amount ${total < 0 ? "negative-cell" : total ? "" : "muted"}">${total ? money(total) : "—"}</td>`;
     }).join("");
-    return `<tr><td class="row-label">${escapeHtml(cat.nombre)}</td>${cells}<td class="row-delete"><button data-collection="categoriasIngreso" data-id="${cat.id}" aria-label="Eliminar">×</button></td></tr>`;
+    return `<tr><td class="row-label">${escapeHtml(cat.nombre)}</td>${cells}</tr>`;
   }).join("");
 
   const totalCells = months.map((mk) => {
@@ -1216,12 +1219,65 @@ function renderIngresosExtra(months) {
     return `<td class="amount ${total < 0 ? "negative-cell" : ""}">${money(total)}</td>`;
   }).join("");
 
-  table.innerHTML = `<thead>${thead}</thead><tbody>${rows}<tr class="total-row"><td class="row-label">Total ingresos extra</td>${totalCells}<td></td></tr></tbody>`;
+  table.innerHTML = `<thead>${thead}</thead><tbody>${rows}<tr class="total-row"><td class="row-label">Total ingresos extra</td>${totalCells}</tr></tbody>`;
 
-  table.querySelectorAll(".ingreso-extra-input").forEach((input) => {
-    input.addEventListener("change", async () => {
-      const monto = parseFloat(input.value) || 0;
-      await guardarIngresoCelda(input.dataset.cat, input.dataset.month, monto);
+  renderIngresosExtraDetalle();
+}
+
+function renderIngresosExtraDetalle() {
+  const container = document.getElementById("ingresos-extra-detalle");
+  if (categoriasIngreso.length === 0) { container.innerHTML = ""; return; }
+
+  container.innerHTML = categoriasIngreso.map((cat) => {
+    const entries = otrosIngresos
+      .filter((o) => o.categoriaId === cat.id)
+      .sort((a, b) => (a.month < b.month ? 1 : -1));
+
+    const entryRows = entries.map((o) => `
+      <tr>
+        <td class="row-label">${formatMonthShort(o.month)}${o.detalle ? ` · ${escapeHtml(o.detalle)}` : ""}</td>
+        <td class="amount ${o.monto < 0 ? "negative-cell" : ""}">${money(o.monto)}</td>
+        <td class="row-delete"><button data-collection="otrosIngresos" data-id="${o.id}" aria-label="Eliminar">×</button></td>
+      </tr>`).join("");
+
+    const totalCat = otrosIngresos.filter((o) => o.categoriaId === cat.id).reduce((s, o) => s + o.monto, 0);
+
+    return `
+      <div class="group-block">
+        <div class="group-header">
+          <input type="text" class="empresa-nombre-edit" data-id="${cat.id}" value="${escapeHtml(cat.nombre)}" style="background:transparent;border:none;color:var(--white);font-family:var(--font-display);font-size:1.02rem;font-weight:600;padding:.15rem 0" />
+          <button class="group-delete" data-collection="categoriasIngreso" data-id="${cat.id}">Eliminar categoría</button>
+        </div>
+        <div class="group-body">
+          <form class="sub-form ingreso-extra-form" data-cat-id="${cat.id}">
+            <div class="sf-field sf-desc"><label>Detalle</label><input type="text" class="ie-detalle" placeholder="Ej: Luesqtoff store" /></div>
+            <div class="sf-field sf-num"><label>Monto (+ suma / − resta)</label><input type="number" class="ie-monto" step="0.01" required placeholder="Ej: -5000" /></div>
+            <div class="sf-field sf-month"><label>Mes</label><input type="month" class="ie-mes" value="${currentMonthKey()}" required /></div>
+            <button type="submit">+ Agregar</button>
+          </form>
+
+          ${entryRows ? `
+          <div class="matrix-wrap">
+            <table class="matrix-table">
+              <thead><tr><th>Mes / Detalle</th><th>Monto</th><th></th></tr></thead>
+              <tbody>${entryRows}<tr class="total-row"><td class="row-label">Total ${escapeHtml(cat.nombre)}</td><td class="amount ${totalCat < 0 ? "negative-cell" : ""}">${money(totalCat)}</td><td></td></tr></tbody>
+            </table>
+          </div>` : `<div class="empty-state">Sin movimientos cargados todavía.</div>`}
+        </div>
+      </div>`;
+  }).join("");
+
+  container.querySelectorAll(".ingreso-extra-form").forEach((f) => {
+    f.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const categoriaId = f.dataset.catId;
+      const detalle = f.querySelector(".ie-detalle").value.trim();
+      const monto = parseFloat(f.querySelector(".ie-monto").value);
+      const month = f.querySelector(".ie-mes").value;
+      if (!monto || !month || !currentPin) return;
+      await addDoc(col("otrosIngresos"), { categoriaId, detalle, monto, month, createdAt: serverTimestamp() });
+      f.reset();
+      f.querySelector(".ie-mes").value = currentMonthKey();
     });
   });
 }
@@ -1263,20 +1319,6 @@ async function guardarGastoCelda(categoriaId, month, moneda, patch) {
   if (!currentPin) return;
   const ref = doc(db, "pins", currentPin, "gastos", gastoDocId(categoriaId, month, moneda));
   await setDoc(ref, { categoriaId, month, moneda, ...patch }, { merge: true });
-}
-
-function ingresoDocId(categoriaId, month) { return `${categoriaId}_${month}`; }
-function ingresoEntryFor(categoriaId, month) {
-  return otrosIngresos.find((o) => o.categoriaId === categoriaId && o.month === month) || null;
-}
-async function guardarIngresoCelda(categoriaId, month, monto) {
-  if (!currentPin) return;
-  const ref = doc(db, "pins", currentPin, "otrosIngresos", ingresoDocId(categoriaId, month));
-  if (!monto) {
-    await deleteDoc(ref).catch(() => {});
-  } else {
-    await setDoc(ref, { categoriaId, month, monto }, { merge: true });
-  }
 }
 
 function otrosIngresosForMonth(monthKey) {
