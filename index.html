@@ -143,10 +143,24 @@ input, select { font-family: var(--font-body); }
 
 /* ===== Card blocks (tarjeta / empresa groups) ===== */
 .group-block { background: var(--white); border: 1px solid var(--paper-line); border-radius: 10px; margin-bottom: 1.4rem; overflow: hidden; box-shadow: 0 2px 10px rgba(28,37,65,.09); }
-.group-header { display: flex; align-items: center; justify-content: space-between; padding: .9rem 1.1rem; background: var(--ink); color: var(--white); box-shadow: inset 0 -2px 0 rgba(0,0,0,.15); }
-.group-header h3 { font-family: var(--font-display); font-size: 1.02rem; margin: 0; }
-.group-delete { background: none; border: none; color: #a9b0c9; font-size: .78rem; text-decoration: underline; }
-.group-delete:hover { color: var(--white); }
+.group-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0 .6rem; background: transparent; border-bottom: 2px solid var(--gold); }
+.group-header h3 { font-family: var(--font-display); font-size: 1.7rem; font-weight: 700; margin: 0; color: var(--gold); text-transform: uppercase; letter-spacing: .02em; }
+.group-delete { background: none; border: none; color: var(--muted); font-size: .82rem; text-decoration: underline; }
+.group-delete:hover { color: var(--expense); }
+.group-header .nombre-titulo-edit {
+  background: transparent;
+  border: none;
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  padding: 0;
+  width: auto;
+  max-width: 70%;
+}
+.group-header .nombre-titulo-edit:focus { outline: none; border-bottom: 1px dashed var(--gold); }
 .group-body { padding: .9rem 1rem; }
 
 .sub-form { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .9rem; align-items: flex-end; }
@@ -302,6 +316,33 @@ input, select { font-family: var(--font-body); }
 .matrix-table td.row-delete button:hover { color: var(--expense); }
 
 .matrix-table td.editable-cell { padding: .3rem .4rem; }
+.dollar-prefix {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--muted);
+  margin-right: .2rem;
+  font-size: .85rem;
+}
+
+/* Signo $ automático en toda celda de monto editable de la app (excepto USD, que ya muestra US$) */
+.matrix-table td.editable-cell { position: relative; }
+.matrix-table td.editable-cell input[type="number"] { padding-left: 1.05rem; }
+.matrix-table td.editable-cell:has(input[type="number"]):not(:has(.cuota-usd))::before {
+  content: "$";
+  position: absolute;
+  left: .55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: .8rem;
+  pointer-events: none;
+}
+/* La celda de montoTotal ya lleva su propio $ manual (span), no dupliques con el de CSS */
+.matrix-table td.editable-cell:has(.dollar-prefix)::before { content: none; }
+.matrix-table td.editable-cell:has(.dollar-prefix) input[type="number"] { padding-left: .4rem; }
+
 .tarjeta-pago-input, .comision-input {
   width: 100px;
   text-align: right;
@@ -460,12 +501,16 @@ input, select { font-family: var(--font-body); }
             <input type="text" id="gn-detalle" placeholder="Ej: Alquiler" required />
           </div>
           <div>
-            <label for="gn-monto">Monto</label>
+            <label for="gn-monto">Monto ($)</label>
             <input type="number" id="gn-monto" step="0.01" min="0" required placeholder="0.00" />
           </div>
           <div>
             <label for="gn-mes">Mes</label>
             <input type="month" id="gn-mes" required />
+          </div>
+          <div class="full" style="display:flex;align-items:center;gap:.4rem;padding-top:.2rem">
+            <input type="checkbox" id="gn-fijo" style="width:auto" />
+            <label for="gn-fijo" style="text-transform:none;font-size:.85rem;color:var(--ink);margin:0">Es un gasto fijo — cargar el mismo monto en los próximos meses</label>
           </div>
           <button type="submit" class="btn-primary full">+ Agregar gasto</button>
         </form>
@@ -853,10 +898,10 @@ function renderTarjetas() {
       return `
         <tr class="${c.esOtro ? "row-otro" : ""} ${esUSD ? "row-usd" : ""}">
           <td class="amount" style="text-align:left">
-            <input type="date" class="compra-edit" data-id="${c.id}" data-field="fecha" value="${c.fecha || ""}" style="border:1px solid var(--paper-line);border-radius:4px;padding:.2rem .25rem;font-size:.88rem;width:120px" />
+            <input type="date" class="compra-edit" data-id="${c.id}" data-field="fecha" value="${c.fecha || ""}" style="border:1px solid var(--paper-line);border-radius:4px;padding:.3rem .35rem;font-size:.92rem;width:140px" />
           </td>
-          <td class="amount" style="text-align:center">
-            <input type="number" step="0.01" min="0" class="compra-edit" data-id="${c.id}" data-field="montoTotal" value="${c.montoTotal}" style="width:100px;text-align:right;border:1px solid var(--paper-line);border-radius:4px;padding:.2rem .35rem;font-family:var(--font-mono);font-size:.9rem;font-weight:600" />
+          <td class="amount editable-cell" style="text-align:center">
+            <span class="dollar-prefix">$</span><input type="number" step="0.01" min="0" class="compra-edit" data-id="${c.id}" data-field="montoTotal" value="${c.montoTotal}" style="width:100px;text-align:right;border:1px solid var(--paper-line);border-radius:4px;padding:.3rem .4rem;font-family:var(--font-mono);font-size:.95rem;font-weight:700" />
           </td>
           <td class="amount" style="text-align:center">${cuotasCell}</td>
           <td class="row-label">
@@ -887,7 +932,7 @@ function renderTarjetas() {
     return `
       <div class="group-block">
         <div class="group-header">
-          <input type="text" class="tarjeta-nombre-edit" data-id="${t.id}" value="${escapeHtml(t.nombre)}" style="background:transparent;border:none;color:var(--white);font-family:var(--font-display);font-size:1.02rem;font-weight:600;padding:.15rem 0" />
+          <input type="text" class="tarjeta-nombre-edit nombre-titulo-edit" data-id="${t.id}" value="${escapeHtml(t.nombre)}" />
           <button class="group-delete" data-collection="tarjetas" data-id="${t.id}">Eliminar tarjeta</button>
         </div>
         <div class="group-body">
@@ -898,7 +943,7 @@ function renderTarjetas() {
               mes(es)
             </span>
             <span style="display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--income);font-weight:600">
-              USD:
+              USD ($):
               <input type="number" min="0" step="0.01" class="cotizacion-input" data-tarjeta-id="${t.id}" value="${cotizacion || ""}" placeholder="0" style="width:80px;text-align:center;border:1px solid var(--income);border-radius:4px;padding:.15rem;font-weight:600;color:var(--income)" />
             </span>
           </div>
@@ -906,7 +951,7 @@ function renderTarjetas() {
           <form class="sub-form compra-form" data-tarjeta-id="${t.id}">
             <div class="sf-field sf-desc"><label>Detalle</label><input type="text" class="c-detalle" placeholder="Ej: Heladera" required /></div>
             <div class="sf-field sf-month"><label>Fecha de compra</label><input type="date" class="c-fecha" value="${new Date().toISOString().slice(0, 10)}" required /></div>
-            <div class="sf-field sf-num"><label class="c-total-label">Monto total</label><input type="number" class="c-total" step="0.01" min="0" required /></div>
+            <div class="sf-field sf-num"><label class="c-total-label">Monto total ($)</label><input type="number" class="c-total" step="0.01" min="0" required /></div>
             <div class="sf-field sf-num c-cuotas-field"><label>Cuotas</label><input type="number" class="c-cuotas" min="1" step="1" value="1" required /></div>
             <div class="sf-field sf-month"><label>1ª cuota (nominal, sin vencimiento)</label><input type="month" class="c-mes" value="${currentMonthKey()}" required /></div>
             <div class="sf-field">
@@ -1169,7 +1214,7 @@ function renderSueldo() {
     return `
       <div class="group-block">
         <div class="group-header">
-          <input type="text" class="empresa-nombre-edit" data-id="${emp.id}" value="${escapeHtml(emp.nombre)}" style="background:transparent;border:none;color:var(--white);font-family:var(--font-display);font-size:1.02rem;font-weight:600;padding:.15rem 0" />
+          <input type="text" class="empresa-nombre-edit nombre-titulo-edit" data-id="${emp.id}" value="${escapeHtml(emp.nombre)}" />
           <button class="group-delete" data-collection="empresas" data-id="${emp.id}">Eliminar empresa</button>
         </div>
         <div class="group-body">
@@ -1295,13 +1340,13 @@ function renderIngresosExtraDetalle() {
     return `
       <div class="group-block">
         <div class="group-header">
-          <input type="text" class="empresa-nombre-edit" data-id="${cat.id}" value="${escapeHtml(cat.nombre)}" style="background:transparent;border:none;color:var(--white);font-family:var(--font-display);font-size:1.02rem;font-weight:600;padding:.15rem 0" />
+          <input type="text" class="categoria-ingreso-nombre-edit nombre-titulo-edit" data-id="${cat.id}" value="${escapeHtml(cat.nombre)}" />
           <button class="group-delete" data-collection="categoriasIngreso" data-id="${cat.id}">Eliminar categoría</button>
         </div>
         <div class="group-body">
           <form class="sub-form ingreso-extra-form" data-cat-id="${cat.id}">
             <div class="sf-field sf-desc"><label>Detalle</label><input type="text" class="ie-detalle" placeholder="Ej: Luesqtoff store" /></div>
-            <div class="sf-field sf-num"><label>Monto (+ suma / − resta)</label><input type="number" class="ie-monto" step="0.01" required placeholder="Ej: -5000" /></div>
+            <div class="sf-field sf-num"><label>Monto $ (+ suma / − resta)</label><input type="number" class="ie-monto" step="0.01" required placeholder="Ej: -5000" /></div>
             <div class="sf-field sf-month"><label>Mes</label><input type="month" class="ie-mes" value="${currentMonthKey()}" required /></div>
             <button type="submit">+ Agregar</button>
           </form>
@@ -1330,6 +1375,14 @@ function renderIngresosExtraDetalle() {
       f.querySelector(".ie-mes").value = currentMonthKey();
     });
   });
+
+  container.querySelectorAll(".categoria-ingreso-nombre-edit").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const nombre = input.value.trim();
+      if (!nombre || !currentPin) return;
+      await updateDoc(doc(db, "pins", currentPin, "categoriasIngreso", input.dataset.id), { nombre });
+    });
+  });
 }
 
 /* =========================================================
@@ -1341,12 +1394,20 @@ document.getElementById("gasto-nuevo-form").addEventListener("submit", async (e)
   const detalle = document.getElementById("gn-detalle").value.trim();
   const monto = parseFloat(document.getElementById("gn-monto").value);
   const month = document.getElementById("gn-mes").value;
+  const esFijo = document.getElementById("gn-fijo").checked;
   if (!detalle || !monto || !month) return;
 
   const catRef = await addDoc(col("categoriasGasto"), { nombre: detalle, createdAt: serverTimestamp() });
-  await setDoc(doc(db, "pins", currentPin, "gastos", gastoDocId(catRef.id, month, "ARS")), {
-    categoriaId: catRef.id, month, moneda: "ARS", monto, vencimiento: "", pagado: false
-  });
+
+  const mesesACargar = esFijo ? 12 : 1; // gasto fijo: replica el monto en los próximos 12 meses
+  const escrituras = [];
+  for (let i = 0; i < mesesACargar; i++) {
+    const mk = addMonths(month, i);
+    escrituras.push(setDoc(doc(db, "pins", currentPin, "gastos", gastoDocId(catRef.id, mk, "ARS")), {
+      categoriaId: catRef.id, month: mk, moneda: "ARS", monto, vencimiento: "", pagado: false
+    }));
+  }
+  await Promise.all(escrituras);
 
   e.target.reset();
   document.getElementById("gn-mes").value = currentMonthKey();
@@ -1391,7 +1452,7 @@ function categoriaTotalUSDForMonth(categoriaId, monthKey) {
 }
 function moneyUSD(n) {
   n = n || 0;
-  return "US$ " + n.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  return "US$ " + n.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 function overrideId(tarjetaId, monthKey) { return `${tarjetaId}_${monthKey}`; }
 function pagoTarjetaOverride(tarjetaId, monthKey) {
