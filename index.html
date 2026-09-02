@@ -37,15 +37,72 @@ input, select { font-family: var(--font-body); }
 .login-mark { font-family: var(--font-display); font-size: 1.9rem; font-weight: 600; margin: 0; text-align: center; }
 .login-mark span { border-bottom: 3px solid var(--gold); padding-bottom: 2px; }
 .login-sub { text-align: center; color: var(--muted); font-size: .85rem; margin: .35rem 0 1.75rem; }
+
+/* ===== PIN keypad login ===== */
+.pin-keypad-card { text-align: center; padding: 2rem 1.5rem 1.75rem; }
+
+.login-badge { display: flex; justify-content: center; margin-bottom: .9rem; }
+.login-badge-ring {
+  width: 78px; height: 78px; border-radius: 50%;
+  border: 2px solid var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.login-badge-ring::before {
+  content: ""; position: absolute; inset: 5px;
+  border: 1px solid var(--gold); border-radius: 50%; opacity: .6;
+}
+.login-badge-initials {
+  font-family: var(--font-display); font-style: italic; font-weight: 600;
+  font-size: 1.5rem; color: var(--gold); letter-spacing: .02em;
+}
+
+.login-brand-name {
+  font-family: var(--font-display); font-style: italic; font-weight: 600;
+  font-size: 2rem; margin: 0; letter-spacing: .01em;
+  background: linear-gradient(135deg, #8a6420, var(--gold) 45%, #d9b878 70%, var(--gold));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.login-brand-sub {
+  font-size: .68rem; letter-spacing: .18em; color: var(--gold);
+  font-weight: 600; margin: .3rem 0 1.4rem;
+}
+
+.pin-dots { display: flex; justify-content: center; gap: .7rem; margin-bottom: .5rem; }
+.pin-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--gold); background: transparent;
+  transition: background .15s ease;
+}
+.pin-dot.filled { background: var(--gold); }
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .85rem;
+  margin: 1.1rem auto 0;
+  max-width: 260px;
+}
+.key {
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: none;
+  background: var(--white);
+  box-shadow: 0 2px 6px rgba(28, 37, 65, .12);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+}
+.key:hover { background: var(--gold-soft); }
+.key:active { transform: scale(.96); }
+.key-text { font-family: var(--font-body); font-size: .78rem; font-weight: 600; color: var(--muted); box-shadow: none; background: transparent; }
+.key-backspace { font-size: 1.1rem; box-shadow: none; background: transparent; color: var(--muted); }
+
+.pin-hint { text-align: center; color: var(--muted); font-size: .74rem; margin-top: 1.3rem; line-height: 1.4; }
 .field { margin-bottom: 1rem; }
-.field input { width: 100%; padding: .65rem .75rem; border: 1px solid var(--paper-line); border-radius: 6px; font-size: .95rem; background: var(--paper); color: var(--ink); }
-.field input:focus { outline: 2px solid var(--gold); outline-offset: 1px; background: var(--white); }
-.btn-primary { width: 100%; padding: .75rem; background: var(--ink); color: var(--white); border: none; border-radius: 6px; font-size: .9rem; font-weight: 600; }
-.btn-primary:hover { background: var(--ink-soft); }
-.auth-error { color: var(--expense); font-size: .82rem; text-align: center; min-height: 1.2em; margin-top: .6rem; }
-.pin-input { width: 100%; padding: .75rem; border: 1px solid var(--paper-line); border-radius: 6px; background: var(--paper); color: var(--ink); font-size: 1.8rem; letter-spacing: .6em; text-align: center; font-family: var(--font-mono); }
-.pin-input:focus { outline: 2px solid var(--gold); outline-offset: 1px; background: var(--white); }
-.pin-hint { text-align: center; color: var(--muted); font-size: .76rem; margin-top: 1.1rem; line-height: 1.4; }
+.auth-error { color: var(--expense); font-size: .82rem; text-align: center; min-height: 1.2em; margin: .6rem 0; }
 
 /* ===== App shell ===== */
 #app-screen { max-width: 1100px; margin: 0 auto; }
@@ -119,6 +176,13 @@ input, select { font-family: var(--font-body); }
 .matrix-table tr.saldo-row td.amount.negative { color: var(--expense); background: var(--expense-soft) !important; }
 .matrix-table tr.section-row td { background: var(--ink-soft) !important; color: var(--white); font-weight: 600; font-size: .76rem; text-transform: uppercase; letter-spacing: .04em; }
 .matrix-table tr.alert-row td { background: var(--expense-soft) !important; color: var(--expense); font-weight: 700; }
+.matrix-table tr.row-otro td { background: #f0ecf9 !important; }
+.matrix-table tr.row-otro td.row-label { border-left: 3px solid #8a6fc9; }
+.matrix-table tr.row-usd td { background: var(--income-soft) !important; }
+.matrix-table tr.row-usd td.row-label { border-left: 3px solid var(--income); }
+.cuota-input.cuota-usd { color: var(--income); font-weight: 700; }
+.matrix-table td.negative-cell input,
+.matrix-table td.negative-cell { color: var(--expense) !important; font-weight: 700; }
 .pagado-toggle { background: none; border: 1px solid var(--paper-line); border-radius: 5px; width: 26px; height: 26px; font-size: .85rem; color: var(--income); }
 .pagado-toggle:hover { border-color: var(--gold); }
 
@@ -208,17 +272,36 @@ input, select { font-family: var(--font-body); }
 
 <!-- LOGIN -->
 <div id="login-screen">
-  <div class="login-card">
-    <p class="login-mark"><span>Libro</span></p>
-    <p class="login-sub">Ingresá tu PIN de 4 dígitos</p>
-    <form id="auth-form">
-      <div class="field">
-        <input type="password" inputmode="numeric" pattern="[0-9]*" id="pin" class="pin-input" maxlength="4" required autocomplete="off" placeholder="••••" />
+  <div class="login-card pin-keypad-card">
+    <div class="login-badge">
+      <div class="login-badge-ring">
+        <span class="login-badge-initials">VO</span>
       </div>
-      <button type="submit" class="btn-primary" id="auth-submit">Entrar</button>
-      <p class="auth-error" id="auth-error"></p>
-    </form>
-    <p class="pin-hint">La primera vez que uses un PIN, queda creado. Usá siempre el mismo PIN en todos tus dispositivos para ver los mismos datos.</p>
+    </div>
+    <p class="login-brand-name">Virginia</p>
+    <p class="login-brand-sub">INGRESOS Y GASTOS</p>
+
+    <div class="pin-dots" id="pin-dots">
+      <span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span>
+    </div>
+    <p class="auth-error" id="auth-error"></p>
+
+    <div class="keypad">
+      <button type="button" class="key" data-digit="1">1</button>
+      <button type="button" class="key" data-digit="2">2</button>
+      <button type="button" class="key" data-digit="3">3</button>
+      <button type="button" class="key" data-digit="4">4</button>
+      <button type="button" class="key" data-digit="5">5</button>
+      <button type="button" class="key" data-digit="6">6</button>
+      <button type="button" class="key" data-digit="7">7</button>
+      <button type="button" class="key" data-digit="8">8</button>
+      <button type="button" class="key" data-digit="9">9</button>
+      <button type="button" class="key key-text" id="key-clear">Borrar</button>
+      <button type="button" class="key" data-digit="0">0</button>
+      <button type="button" class="key key-backspace" id="key-backspace" aria-label="Borrar último dígito">⌫</button>
+    </div>
+
+    <p class="pin-hint">Escribí los 4 números y apretá Enter, o tocá el teclado.</p>
   </div>
 </div>
 
@@ -229,7 +312,7 @@ input, select { font-family: var(--font-body); }
     <div class="brand"><span>Libro</span></div>
     <nav class="tabs" id="tabs">
       <button class="tab-btn active" data-tab="tarjetas">Tarjetas</button>
-      <button class="tab-btn" data-tab="sueldo">Sueldo</button>
+      <button class="tab-btn" data-tab="sueldo">Ingresos</button>
       <button class="tab-btn" data-tab="gastos">Gastos</button>
     </nav>
     <button id="logout-btn">Cambiar PIN</button>
@@ -265,6 +348,18 @@ input, select { font-family: var(--font-body); }
       <div id="empresas-container"></div>
 
       <div class="grand-total-wrap" id="sueldo-grand-total"></div>
+
+      <div class="section-divider">Ingresos Extra</div>
+      <p style="font-size:.82rem;color:var(--muted);margin:-.5rem 0 .8rem">Quién te paga, reintegros, adelantos, etc. Los montos negativos restan (ej: "-100000" para un adelanto).</p>
+      <div class="mini-form-bar">
+        <form id="categoria-ingreso-form" class="mini-form">
+          <input type="text" id="categoria-ingreso-nombre" placeholder="Ej: Papá - reintegro tarjeta" required />
+          <button type="submit" class="btn-secondary">+ Nueva categoría</button>
+        </form>
+      </div>
+      <div class="matrix-wrap">
+        <table class="matrix-table" id="ingresos-extra-table"></table>
+      </div>
     </section>
 
     <!-- ===================== GASTOS ===================== -->
@@ -285,28 +380,24 @@ input, select { font-family: var(--font-body); }
         <table class="matrix-table" id="resumen-table"></table>
       </div>
 
-      <div class="section-divider">Ingresos extra</div>
-      <p style="font-size:.82rem;color:var(--muted);margin:-.5rem 0 .8rem">Acá también va lo que te devuelven tus papás o tu hermana por compras de tarjeta. Cargá el monto directo en la celda del mes, en el cuadro de arriba.</p>
-
-      <div class="mini-form-bar">
-        <form id="categoria-ingreso-form" class="mini-form">
-          <input type="text" id="categoria-ingreso-nombre" placeholder="Ej: Papá - reintegro tarjeta" required />
-          <button type="submit" class="btn-secondary">+ Nueva categoría de ingreso</button>
+      <div class="section-divider">Gastos</div>
+      <p style="font-size:.82rem;color:var(--muted);margin:-.5rem 0 .8rem">Cargá el detalle y el monto — queda como fila fija que después podés editar mes a mes.</p>
+      <div class="add-card">
+        <form id="gasto-nuevo-form" class="form-grid">
+          <div class="full">
+            <label for="gn-detalle">Detalle</label>
+            <input type="text" id="gn-detalle" placeholder="Ej: Alquiler" required />
+          </div>
+          <div>
+            <label for="gn-monto">Monto</label>
+            <input type="number" id="gn-monto" step="0.01" min="0" required placeholder="0.00" />
+          </div>
+          <div>
+            <label for="gn-mes">Mes</label>
+            <input type="month" id="gn-mes" required />
+          </div>
+          <button type="submit" class="btn-primary full">+ Agregar gasto</button>
         </form>
-      </div>
-
-      <div class="section-divider">Categorías de gasto</div>
-      <p style="font-size:.82rem;color:var(--muted);margin:-.5rem 0 .8rem">Cargá el monto, vencimiento y si ya lo pagaste directo en la celda del mes, en el cuadro de arriba.</p>
-      <div class="mini-form-bar">
-        <form id="categoria-form" class="mini-form">
-          <input type="text" id="categoria-nombre" placeholder="Nombre de categoría (ej: Alquiler)" required />
-          <button type="submit" class="btn-secondary">+ Nueva categoría</button>
-        </form>
-      </div>
-
-      <div class="section-divider">Gastos en USD (aparte de los pesos)</div>
-      <div class="matrix-wrap">
-        <table class="matrix-table" id="resumen-usd-table"></table>
       </div>
 
     </section>
@@ -339,7 +430,8 @@ let unsubs = [];
 
 // ---- Data ----
 let tarjetas = [];      // {id, nombre}
-let compras = [];       // {id, tarjetaId, fecha, detalle, montoTotal, cuotas, mesPrimeraCuota}
+let compras = [];       // {id, tarjetaId, fecha, detalle, montoTotal, cuotas, mesPrimeraCuota, recurrente, esOtro}
+let cuotasOverride = []; // {id, compraId, month, monto} — edición manual celda por celda
 let comisiones = [];    // {id, tarjetaId, month, monto}
 let empresas = [];      // {id, nombre}
 let sueldos = [];       // {id, empresaId, mesPago, bruto, neto, ninera, comedor, pagoHaberes}
@@ -353,7 +445,8 @@ let settings = { mesInicio: null }; // ventana de meses visible (archivado manua
 /* ---------- Helpers ---------- */
 function money(n) {
   n = n || 0;
-  return "$" + n.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  const sign = n < 0 ? "-" : "";
+  return sign + "$" + Math.abs(n).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 function currentMonthKey() {
   const d = new Date();
@@ -414,42 +507,63 @@ function isAlerta(g) {
   return todayISO() >= alertaDesde;
 }
 
-/* ---------- Auth (PIN) ---------- */
+/* ---------- Auth (PIN keypad) ---------- */
 const loginScreen = document.getElementById("login-screen");
 const appScreen = document.getElementById("app-screen");
-const authForm = document.getElementById("auth-form");
 const authError = document.getElementById("auth-error");
-const pinInput = document.getElementById("pin");
+const pinDots = document.querySelectorAll(".pin-dot");
+let pinValue = "";
 
-authForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+function updateDots() {
+  pinDots.forEach((dot, i) => dot.classList.toggle("filled", i < pinValue.length));
+}
+function clearPin() {
+  pinValue = "";
+  updateDots();
+}
+function appendDigit(d) {
+  if (pinValue.length >= 4) return;
   authError.textContent = "";
-  const pin = pinInput.value.trim();
-  if (!/^\d{4}$/.test(pin)) { authError.textContent = "El PIN debe tener 4 números."; return; }
+  pinValue += d;
+  updateDots();
+  if (pinValue.length === 4) attemptLogin();
+}
+function removeDigit() {
+  pinValue = pinValue.slice(0, -1);
+  updateDots();
+}
+async function attemptLogin() {
+  if (!/^\d{4}$/.test(pinValue)) { authError.textContent = "El PIN debe tener 4 números."; return; }
   try {
     if (!auth.currentUser) await signInAnonymously(auth);
-    enterApp(pin);
+    enterApp(pinValue);
   } catch (err) {
     authError.textContent = "No se pudo conectar. Probá de nuevo.";
+    clearPin();
   }
-});
+}
 
-// Asegura que Enter dispare el envío del formulario en cualquier navegador/teclado móvil
-pinInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    authForm.requestSubmit();
-  }
+document.querySelectorAll(".key[data-digit]").forEach((btn) => {
+  btn.addEventListener("click", () => appendDigit(btn.dataset.digit));
+});
+document.getElementById("key-clear").addEventListener("click", clearPin);
+document.getElementById("key-backspace").addEventListener("click", removeDigit);
+
+// Tipeo directo por teclado físico + Enter
+window.addEventListener("keydown", (e) => {
+  if (loginScreen.classList.contains("hidden")) return;
+  if (/^[0-9]$/.test(e.key)) { appendDigit(e.key); }
+  else if (e.key === "Backspace") { removeDigit(); }
+  else if (e.key === "Enter") { attemptLogin(); }
 });
 
 document.getElementById("logout-btn").addEventListener("click", () => {
   currentPin = null;
   unsubs.forEach((u) => u()); unsubs = [];
-  tarjetas = []; compras = []; comisiones = []; empresas = []; sueldos = []; categorias = []; gastos = []; otrosIngresos = []; categoriasIngreso = []; pagosTarjeta = [];
+  tarjetas = []; compras = []; cuotasOverride = []; comisiones = []; empresas = []; sueldos = []; categorias = []; gastos = []; otrosIngresos = []; categoriasIngreso = []; pagosTarjeta = [];
   appScreen.classList.add("hidden");
   loginScreen.classList.remove("hidden");
-  pinInput.value = "";
-  pinInput.focus();
+  clearPin();
 });
 
 function enterApp(pin) {
@@ -480,6 +594,9 @@ function startListening(pin) {
   }));
   unsubs.push(onSnapshot(query(col("compras"), orderBy("mesPrimeraCuota")), (s) => {
     compras = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
+  }));
+  unsubs.push(onSnapshot(col("cuotasOverride"), (s) => {
+    cuotasOverride = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
   }));
   unsubs.push(onSnapshot(col("comisiones"), (s) => {
     comisiones = s.docs.map((d) => ({ id: d.id, ...d.data() })); renderAll();
@@ -551,15 +668,56 @@ document.getElementById("tarjeta-form").addEventListener("submit", async (e) => 
   e.target.reset();
 });
 
+function tarjetaVencimientoOffset(tarjetaId) {
+  const t = tarjetas.find((tt) => tt.id === tarjetaId);
+  return t && typeof t.vencimientoOffset === "number" ? t.vencimientoOffset : 1;
+}
+
+function compraInicioVencimiento(compra) {
+  const offset = tarjetaVencimientoOffset(compra.tarjetaId);
+  return addMonths(compra.mesPrimeraCuota, offset);
+}
+
 function cuotaMontoForMonth(compra, monthKey) {
+  const mesInicioVencimiento = compraInicioVencimiento(compra);
   if (compra.recurrente) {
-    return monthKey >= compra.mesPrimeraCuota ? compra.montoTotal : 0;
+    return monthKey >= mesInicioVencimiento ? compra.montoTotal : 0;
   }
   const cuota = compra.montoTotal / compra.cuotas;
   for (let i = 0; i < compra.cuotas; i++) {
-    if (addMonths(compra.mesPrimeraCuota, i) === monthKey) return cuota;
+    if (addMonths(mesInicioVencimiento, i) === monthKey) return cuota;
   }
   return 0;
+}
+function cuotaOverrideFor(compraId, monthKey) {
+  return cuotasOverride.find((o) => o.compraId === compraId && o.month === monthKey) || null;
+}
+// El override vigente para un débito automático en un mes dado: el más reciente <= ese mes (se "copia" hacia adelante)
+function cuotaOverrideVigente(compra, monthKey, excluirMes) {
+  const mesInicio = compraInicioVencimiento(compra);
+  const candidatos = cuotasOverride
+    .filter((o) => o.compraId === compra.id && o.month <= monthKey && o.month >= mesInicio && o.month !== excluirMes)
+    .sort((a, b) => (a.month < b.month ? 1 : -1)); // más reciente primero
+  return candidatos[0] || null;
+}
+// Monto real de esa cuota ese mes: el editado a mano si existe, sino el calculado.
+// Para débito automático, un cambio se "copia" a todos los meses siguientes hasta el próximo cambio.
+function cuotaMontoEfectivo(compra, monthKey) {
+  if (compra.recurrente) {
+    const override = cuotaOverrideVigente(compra, monthKey);
+    return override ? override.monto : cuotaMontoForMonth(compra, monthKey);
+  }
+  const override = cuotaOverrideFor(compra.id, monthKey);
+  return override ? override.monto : cuotaMontoForMonth(compra, monthKey);
+}
+async function guardarCuotaOverride(compraId, monthKey, monto, montoCalculado) {
+  if (!currentPin) return;
+  const ref = doc(db, "pins", currentPin, "cuotasOverride", `${compraId}_${monthKey}`);
+  if (Math.abs(monto - montoCalculado) < 0.005) {
+    await deleteDoc(ref).catch(() => {});
+  } else {
+    await setDoc(ref, { compraId, month: monthKey, monto, createdAt: serverTimestamp() });
+  }
 }
 
 function comisionForMonth(tarjetaId, monthKey) {
@@ -568,9 +726,19 @@ function comisionForMonth(tarjetaId, monthKey) {
     .reduce((s, c) => s + c.monto, 0);
 }
 
+function tarjetaCotizacion(tarjetaId) {
+  const t = tarjetas.find((tt) => tt.id === tarjetaId);
+  return t && typeof t.cotizacionUSD === "number" ? t.cotizacionUSD : 0;
+}
+
 function tarjetaTotalForMonth(tarjetaId, monthKey) {
   const comprasCard = compras.filter((c) => c.tarjetaId === tarjetaId);
-  const cuotasTotal = comprasCard.reduce((s, c) => s + cuotaMontoForMonth(c, monthKey), 0);
+  const cotizacion = tarjetaCotizacion(tarjetaId);
+  const cuotasTotal = comprasCard.reduce((s, c) => {
+    const monto = cuotaMontoEfectivo(c, monthKey);
+    const enPesos = c.moneda === "USD" ? monto * cotizacion : monto;
+    return s + enPesos;
+  }, 0);
   return cuotasTotal + comisionForMonth(tarjetaId, monthKey);
 }
 
@@ -585,26 +753,58 @@ function renderTarjetas() {
   }
 
   container.innerHTML = tarjetas.map((t) => {
-    const comprasCard = compras.filter((c) => c.tarjetaId === t.id);
+    const comprasCard = compras
+      .filter((c) => c.tarjetaId === t.id)
+      .sort((a, b) => (a.fecha || "").localeCompare(b.fecha || ""));
 
     const rows = comprasCard.map((c) => {
-      const cuota = c.recurrente ? c.montoTotal : c.montoTotal / c.cuotas;
+      const esUSD = c.moneda === "USD";
       const cells = months.map((mk) => {
-        const val = cuotaMontoForMonth(c, mk);
-        return `<td class="amount ${val ? "" : "muted"}">${val ? money(val) : "—"}</td>`;
+        const override = c.recurrente ? cuotaOverrideVigente(c, mk) : cuotaOverrideFor(c.id, mk);
+        // baseline para decidir si "deshacer" el cambio: el valor vigente SIN el override propio de este mes
+        const calculado = c.recurrente
+          ? (() => {
+              const previo = cuotaOverrideVigente(c, mk, mk);
+              return previo ? previo.monto : cuotaMontoForMonth(c, mk);
+            })()
+          : cuotaMontoForMonth(c, mk);
+        const valor = cuotaMontoEfectivo(c, mk);
+        return `<td class="amount editable-cell">
+          ${esUSD ? '<span style="font-size:.62rem;color:var(--income);font-weight:700">US$</span>' : ""}
+          <input type="number" step="0.01" class="cuota-input ${override ? "edited" : ""} ${esUSD ? "cuota-usd" : ""}"
+            data-compra-id="${c.id}" data-month="${mk}" data-calculado="${calculado}"
+            value="${valor || ""}" placeholder="0" title="${override ? (c.recurrente ? "Editado — se copia a los meses siguientes" : "Editado a mano") : "Calculado automáticamente"}" />
+        </td>`;
       }).join("");
-      const cuotasLabel = c.recurrente ? "DA" : c.cuotas;
-      const subLabel = c.recurrente
-        ? `Débito automático · ${money(cuota)}/mes`
-        : `${money(cuota)} c/u`;
-      const fechaFmt = c.fecha
-        ? new Date(c.fecha + "T00:00:00").toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" })
-        : "—";
+      const cuotasCell = c.recurrente
+        ? `<span style="font-weight:600;font-size:.78rem">DA</span>`
+        : `<input type="number" class="compra-edit" data-id="${c.id}" data-field="cuotas" min="1" step="1" value="${c.cuotas}" style="width:44px;text-align:center;border:1px solid var(--paper-line);border-radius:4px;padding:.15rem" />`;
       return `
-        <tr>
-          <td class="amount muted" style="text-align:left">${fechaFmt}</td>
-          <td class="amount" style="text-align:center;font-weight:600">${cuotasLabel}</td>
-          <td class="row-label">${escapeHtml(c.detalle)}<br><span style="font-weight:400;font-size:.72rem;color:var(--muted)">${subLabel}</span></td>
+        <tr class="${c.esOtro ? "row-otro" : ""} ${esUSD ? "row-usd" : ""}">
+          <td class="amount" style="text-align:left">
+            <input type="date" class="compra-edit" data-id="${c.id}" data-field="fecha" value="${c.fecha || ""}" style="border:1px solid var(--paper-line);border-radius:4px;padding:.15rem .2rem;font-size:.76rem;width:110px" />
+          </td>
+          <td class="amount" style="text-align:center">
+            <input type="number" step="0.01" min="0" class="compra-edit" data-id="${c.id}" data-field="montoTotal" value="${c.montoTotal}" style="width:90px;text-align:right;border:1px solid var(--paper-line);border-radius:4px;padding:.15rem .3rem;font-family:var(--font-mono);font-size:.78rem" />
+          </td>
+          <td class="amount" style="text-align:center">${cuotasCell}</td>
+          <td class="row-label">
+            <input type="text" class="compra-edit" data-id="${c.id}" data-field="detalle" value="${escapeHtml(c.detalle)}" style="width:100%;border:none;background:transparent;font-weight:600;font-family:inherit;font-size:.88rem;padding:.1rem 0;color:var(--ink)" />
+          </td>
+          <td class="amount" style="text-align:left;padding:.3rem .4rem">
+            <div style="display:flex;flex-direction:column;gap:.25rem">
+              <select class="compra-edit compra-moneda-select" data-id="${c.id}" data-field="moneda" style="font-size:.66rem;border:1px solid var(--paper-line);border-radius:4px;padding:.1rem .2rem;color:${esUSD ? "var(--income)" : "var(--ink)"};font-weight:${esUSD ? "700" : "400"}">
+                <option value="ARS" ${!esUSD ? "selected" : ""}>Pesos</option>
+                <option value="USD" ${esUSD ? "selected" : ""}>USD</option>
+              </select>
+              <label style="font-size:.66rem;color:var(--muted);display:inline-flex;align-items:center;gap:.2rem;white-space:nowrap">
+                <input type="checkbox" class="compra-recurrente-toggle" data-id="${c.id}" ${c.recurrente ? "checked" : ""} style="width:auto" /> Débito auto.
+              </label>
+              <label style="font-size:.66rem;color:var(--gold);font-weight:600;display:inline-flex;align-items:center;gap:.2rem;white-space:nowrap">
+                <input type="checkbox" class="compra-otro-toggle" data-id="${c.id}" ${c.esOtro ? "checked" : ""} style="width:auto" /> Adicional/Otros
+              </label>
+            </div>
+          </td>
           ${cells}
           <td class="row-delete"><button data-collection="compras" data-id="${c.id}" aria-label="Eliminar">×</button></td>
         </tr>`;
@@ -617,21 +817,42 @@ function renderTarjetas() {
 
     const totalCells = months.map((mk) => `<td class="amount">${money(tarjetaTotalForMonth(t.id, mk))}</td>`).join("");
 
-    const thead = `<tr><th>Fecha</th><th>Cuotas</th><th>Detalle</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}<th></th></tr>`;
+    const thead = `<tr><th>Fecha</th><th>Total</th><th>Cuotas</th><th>Detalle</th><th>Tipo</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}<th></th></tr>`;
+
+    const cotizacion = tarjetaCotizacion(t.id);
 
     return `
       <div class="group-block">
         <div class="group-header">
-          <h3>${escapeHtml(t.nombre)}</h3>
+          <input type="text" class="tarjeta-nombre-edit" data-id="${t.id}" value="${escapeHtml(t.nombre)}" style="background:transparent;border:none;color:var(--white);font-family:var(--font-display);font-size:1.02rem;font-weight:600;padding:.15rem 0" />
           <button class="group-delete" data-collection="tarjetas" data-id="${t.id}">Eliminar tarjeta</button>
         </div>
         <div class="group-body">
+          <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:var(--paper);border-radius:6px;font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">
+            <span>El vencimiento cae</span>
+            <input type="number" min="0" step="1" class="vencimiento-offset-input" data-tarjeta-id="${t.id}" value="${tarjetaVencimientoOffset(t.id)}" style="width:46px;text-align:center;border:1px solid var(--paper-line);border-radius:4px;padding:.15rem" />
+            <span>mes(es) después de la cuota que cargues abajo (por defecto 1 — ej: cuota de septiembre vence en octubre).</span>
+          </div>
+
+          <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:var(--income-soft);border-radius:6px;font-size:.78rem;color:var(--income);display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;font-weight:600">
+            <span>Cotización USD:</span>
+            <input type="number" min="0" step="0.01" class="cotizacion-input" data-tarjeta-id="${t.id}" value="${cotizacion || ""}" placeholder="Ej: 1450" style="width:90px;text-align:center;border:1px solid var(--income);border-radius:4px;padding:.15rem;font-weight:600;color:var(--income)" />
+            <span style="font-weight:400">$ por USD — se usa para sumar las compras en dólares al total de la tarjeta, todo en pesos.</span>
+          </div>
+
           <form class="sub-form compra-form" data-tarjeta-id="${t.id}">
             <div class="sf-field sf-desc"><label>Detalle</label><input type="text" class="c-detalle" placeholder="Ej: Heladera" required /></div>
             <div class="sf-field sf-month"><label>Fecha de compra</label><input type="date" class="c-fecha" value="${new Date().toISOString().slice(0, 10)}" required /></div>
             <div class="sf-field sf-num"><label class="c-total-label">Monto total</label><input type="number" class="c-total" step="0.01" min="0" required /></div>
             <div class="sf-field sf-num c-cuotas-field"><label>Cuotas</label><input type="number" class="c-cuotas" min="1" step="1" value="1" required /></div>
-            <div class="sf-field sf-month"><label>1ª cuota / mes desde</label><input type="month" class="c-mes" value="${currentMonthKey()}" required /></div>
+            <div class="sf-field sf-month"><label>1ª cuota (nominal, sin vencimiento)</label><input type="month" class="c-mes" value="${currentMonthKey()}" required /></div>
+            <div class="sf-field">
+              <label>Moneda</label>
+              <select class="c-moneda">
+                <option value="ARS">Pesos</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
             <div class="sf-field" style="flex-direction:row;align-items:center;gap:.4rem;padding-bottom:.5rem">
               <input type="checkbox" class="c-recurrente" id="rec-${t.id}" style="width:auto" />
               <label for="rec-${t.id}" style="text-transform:none;font-size:.78rem;color:var(--ink)">Débito automático (mismo monto todos los meses)</label>
@@ -643,9 +864,9 @@ function renderTarjetas() {
             <table class="matrix-table">
               <thead>${thead}</thead>
               <tbody>
-                ${rows || `<tr><td colspan="${months.length + 4}" class="empty-state">Sin compras cargadas.</td></tr>`}
-                <tr><td></td><td></td><td class="row-label">Comisión</td>${comisionCells}<td></td></tr>
-                <tr class="total-row"><td></td><td></td><td class="row-label">Total tarjeta</td>${totalCells}<td></td></tr>
+                ${rows || `<tr><td colspan="${months.length + 6}" class="empty-state">Sin compras cargadas.</td></tr>`}
+                <tr><td></td><td></td><td></td><td class="row-label">Comisión</td><td></td>${comisionCells}<td></td></tr>
+                <tr class="total-row"><td></td><td></td><td></td><td class="row-label">Total tarjeta</td><td></td>${totalCells}<td></td></tr>
               </tbody>
             </table>
           </div>
@@ -697,10 +918,11 @@ function renderTarjetas() {
       const recurrente = f.querySelector(".c-recurrente").checked;
       const cuotas = recurrente ? 1 : parseInt(f.querySelector(".c-cuotas").value, 10);
       const mesPrimeraCuota = f.querySelector(".c-mes").value;
+      const moneda = f.querySelector(".c-moneda").value;
       if (!detalle || !fecha || !montoTotal || !cuotas || !mesPrimeraCuota) return;
       await addDoc(col("compras"), {
         tarjetaId, detalle, fecha,
-        montoTotal, cuotas, mesPrimeraCuota, recurrente,
+        montoTotal, cuotas, mesPrimeraCuota, recurrente, moneda,
         createdAt: serverTimestamp()
       });
     });
@@ -717,6 +939,67 @@ function renderTarjetas() {
       } else {
         await setDoc(ref, { tarjetaId, month, monto, createdAt: serverTimestamp() });
       }
+    });
+  });
+
+  // Nombre de tarjeta editable
+  container.querySelectorAll(".tarjeta-nombre-edit").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const nombre = input.value.trim();
+      if (!nombre) return;
+      await updateDoc(doc(db, "pins", currentPin, "tarjetas", input.dataset.id), { nombre });
+    });
+  });
+
+  // Desfasaje de vencimiento por tarjeta
+  container.querySelectorAll(".vencimiento-offset-input").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const offset = parseInt(input.value, 10);
+      await updateDoc(doc(db, "pins", currentPin, "tarjetas", input.dataset.tarjetaId), { vencimientoOffset: isNaN(offset) ? 1 : offset });
+    });
+  });
+
+  // Cotización USD por tarjeta
+  container.querySelectorAll(".cotizacion-input").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const cotizacion = parseFloat(input.value) || 0;
+      await updateDoc(doc(db, "pins", currentPin, "tarjetas", input.dataset.tarjetaId), { cotizacionUSD: cotizacion });
+    });
+  });
+
+  // Campos de la compra editables (fecha, cuotas, detalle, monto total)
+  container.querySelectorAll(".compra-edit").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const field = input.dataset.field;
+      let value = input.value;
+      if (field === "montoTotal") value = parseFloat(value) || 0;
+      if (field === "cuotas") value = parseInt(value, 10) || 1;
+      await updateDoc(doc(db, "pins", currentPin, "compras", input.dataset.id), { [field]: value });
+    });
+  });
+
+  // Toggle Débito automático
+  container.querySelectorAll(".compra-recurrente-toggle").forEach((cb) => {
+    cb.addEventListener("change", async () => {
+      await updateDoc(doc(db, "pins", currentPin, "compras", cb.dataset.id), { recurrente: cb.checked });
+    });
+  });
+
+  // Toggle Adicional/Otros
+  container.querySelectorAll(".compra-otro-toggle").forEach((cb) => {
+    cb.addEventListener("change", async () => {
+      await updateDoc(doc(db, "pins", currentPin, "compras", cb.dataset.id), { esOtro: cb.checked });
+    });
+  });
+
+  // Edición manual celda por celda (por mes) de cada compra
+  container.querySelectorAll(".cuota-input").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const compraId = input.dataset.compraId;
+      const month = input.dataset.month;
+      const calculado = parseFloat(input.dataset.calculado);
+      const nuevo = parseFloat(input.value) || 0;
+      await guardarCuotaOverride(compraId, month, nuevo, calculado);
     });
   });
 }
@@ -736,6 +1019,21 @@ function pagoHaberesForMonth(empresaId, monthKey) {
   return sueldos
     .filter((s) => s.empresaId === empresaId && s.mesPago === monthKey)
     .reduce((sum, s) => sum + (s.pagoHaberes || 0), 0);
+}
+
+function sueldoDocId(empresaId, month) { return `${empresaId}_${month}`; }
+function sueldoEntryFor(empresaId, month) {
+  return sueldos.find((s) => s.empresaId === empresaId && s.mesPago === month) || null;
+}
+async function guardarSueldoCelda(empresaId, month, field, value, soloManual) {
+  if (!currentPin) return;
+  const existing = sueldoEntryFor(empresaId, month) || {};
+  const merged = { ...existing, empresaId, mesPago: month, [field]: value };
+  if (!soloManual && (field === "neto" || field === "ninera" || field === "comedor")) {
+    merged.pagoHaberes = (merged.neto || 0) + (merged.ninera || 0) - (merged.comedor || 0);
+  }
+  const ref = doc(db, "pins", currentPin, "sueldos", sueldoDocId(empresaId, month));
+  await setDoc(ref, merged, { merge: true });
 }
 
 const SUELDO_FIELD_DEFS = [
@@ -769,17 +1067,9 @@ function renderSueldo() {
     return;
   }
 
-  const fields = [
-    { key: "bruto", label: "Bruto" },
-    { key: "neto", label: "Neto sin comedor" },
-    { key: "ninera", label: "Niñera" },
-    { key: "comedor", label: "Comedor" },
-    { key: "pagoHaberes", label: "Pago haberes" },
-  ];
-
   container.innerHTML = empresas.map((emp) => {
     const ocultos = camposOcultosFor(emp);
-    const visibleFields = fields.filter((f) => f.key === "pagoHaberes" || !ocultos.includes(f.key));
+    const soloManual = ocultos.includes("neto") && ocultos.includes("ninera") && ocultos.includes("comedor");
 
     const fieldToggles = SUELDO_FIELD_DEFS.map((f) => `
       <label style="display:inline-flex;align-items:center;gap:.3rem;font-size:.75rem;color:var(--muted);margin-right:.9rem">
@@ -787,48 +1077,53 @@ function renderSueldo() {
         ${f.label}
       </label>`).join("");
 
-    const rows = visibleFields.map((f) => {
+    function fieldRow(field, label, isNumber = true) {
       const cells = months.map((mk) => {
-        const entries = sueldos.filter((s) => s.empresaId === emp.id && s.mesPago === mk);
-        const val = entries.reduce((sum, s) => sum + (s[f.key] || 0), 0);
+        const entry = sueldoEntryFor(emp.id, mk);
+        const val = entry ? entry[field] : "";
+        if (isNumber) {
+          return `<td class="amount editable-cell"><input type="number" step="0.01" class="sueldo-field-input" data-empresa-id="${emp.id}" data-month="${mk}" data-field="${field}" value="${val || ""}" placeholder="0" /></td>`;
+        }
+        return `<td class="amount editable-cell"><input type="text" class="sueldo-field-input" data-empresa-id="${emp.id}" data-month="${mk}" data-field="${field}" value="${escapeHtml(val || "")}" placeholder="—" style="font-size:.74rem;text-align:center" /></td>`;
+      }).join("");
+      return `<tr><td class="row-label">${label}</td>${cells}<td></td></tr>`;
+    }
+
+    function pagoHaberesRow() {
+      const cells = months.map((mk) => {
+        const entry = sueldoEntryFor(emp.id, mk);
+        const val = entry ? entry.pagoHaberes || 0 : 0;
+        if (soloManual) {
+          return `<td class="amount editable-cell"><input type="number" step="0.01" class="sueldo-field-input" data-empresa-id="${emp.id}" data-month="${mk}" data-field="pagoHaberes" value="${val || ""}" placeholder="0" /></td>`;
+        }
         return `<td class="amount ${val ? "" : "muted"}">${val ? money(val) : "—"}</td>`;
       }).join("");
-      const isTotal = f.key === "pagoHaberes";
-      return `<tr class="${isTotal ? "total-row" : ""}"><td class="row-label">${f.label}</td>${cells}<td></td></tr>`;
-    }).join("");
+      return `<tr class="total-row"><td class="row-label">${soloManual ? "Pago haberes" : "Pago haberes (auto)"}</td>${cells}<td></td></tr>`;
+    }
+
+    const rows = [
+      !ocultos.includes("periodo") ? fieldRow("periodoPagado", "Período trabajado", false) : "",
+      !ocultos.includes("bruto") ? fieldRow("bruto", "Bruto") : "",
+      !ocultos.includes("neto") ? fieldRow("neto", "Neto sin comedor") : "",
+      !ocultos.includes("ninera") ? fieldRow("ninera", "Niñera (+ suma)") : "",
+      !ocultos.includes("comedor") ? fieldRow("comedor", "Comedor (− resta)") : "",
+      pagoHaberesRow(),
+    ].join("");
 
     const thead = `<tr><th>Concepto</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}<th></th></tr>`;
-
-    // list of individual entries (to allow delete)
-    const entriesRows = sueldos.filter((s) => s.empresaId === emp.id).map((s) => `
-      <tr>
-        <td class="row-label">${formatMonthShort(s.mesPago)}${s.periodoPagado ? ` <span style="font-weight:400;color:var(--muted);font-size:.72rem">(trabajado: ${escapeHtml(s.periodoPagado)})</span>` : ""}</td>
-        <td class="amount">${money(s.pagoHaberes)}</td>
-        <td class="row-delete"><button data-collection="sueldos" data-id="${s.id}" aria-label="Eliminar">×</button></td>
-      </tr>`).join("");
 
     return `
       <div class="group-block">
         <div class="group-header">
-          <h3>${escapeHtml(emp.nombre)}</h3>
+          <input type="text" class="empresa-nombre-edit" data-id="${emp.id}" value="${escapeHtml(emp.nombre)}" style="background:transparent;border:none;color:var(--white);font-family:var(--font-display);font-size:1.02rem;font-weight:600;padding:.15rem 0" />
           <button class="group-delete" data-collection="empresas" data-id="${emp.id}">Eliminar empresa</button>
         </div>
         <div class="group-body">
-          <div style="margin-bottom:.8rem;padding:.5rem .6rem;background:var(--paper);border-radius:6px">
+          <button type="button" class="campos-toggle-btn" data-empresa-id="${emp.id}" style="background:none;border:1px solid var(--paper-line);border-radius:6px;padding:.35rem .7rem;font-size:.75rem;color:var(--muted);margin-bottom:.7rem">⚙ Campos visibles</button>
+          <div class="campos-panel hidden" id="campos-panel-${emp.id}" style="margin-bottom:.8rem;padding:.5rem .6rem;background:var(--paper);border-radius:6px">
             <span style="font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);display:block;margin-bottom:.35rem">Campos visibles en esta empresa</span>
             ${fieldToggles}
           </div>
-
-          <form class="sub-form sueldo-form" data-empresa-id="${emp.id}">
-            <div class="sf-field sf-month"><label>Mes de pago</label><input type="month" class="s-mes" value="${currentMonthKey()}" required /></div>
-            ${!ocultos.includes("periodo") ? `<div class="sf-field sf-desc" style="flex:0 0 110px"><label>Período trabajado (opcional)</label><input type="text" class="s-periodo" placeholder="Ej: may-26" /></div>` : ""}
-            ${!ocultos.includes("bruto") ? `<div class="sf-field sf-num"><label>Bruto</label><input type="number" class="s-bruto" step="0.01" min="0" /></div>` : ""}
-            ${!ocultos.includes("neto") ? `<div class="sf-field sf-num"><label>Neto s/comedor</label><input type="number" class="s-neto" step="0.01" min="0" /></div>` : ""}
-            ${!ocultos.includes("ninera") ? `<div class="sf-field sf-num"><label>Niñera</label><input type="number" class="s-ninera" step="0.01" min="0" /></div>` : ""}
-            ${!ocultos.includes("comedor") ? `<div class="sf-field sf-num"><label>Comedor</label><input type="number" class="s-comedor" step="0.01" min="0" /></div>` : ""}
-            <div class="sf-field sf-num"><label>Pago haberes</label><input type="number" class="s-haberes" step="0.01" min="0" required /></div>
-            <button type="submit">+ Agregar sueldo</button>
-          </form>
 
           <div class="matrix-wrap">
             <table class="matrix-table">
@@ -836,14 +1131,6 @@ function renderSueldo() {
               <tbody>${rows}</tbody>
             </table>
           </div>
-
-          ${entriesRows ? `
-          <div class="matrix-wrap" style="margin-top:.6rem">
-            <table class="matrix-table">
-              <thead><tr><th>Sueldos cargados</th><th>Pago haberes</th><th></th></tr></thead>
-              <tbody>${entriesRows}</tbody>
-            </table>
-          </div>` : ""}
         </div>
       </div>`;
   }).join("");
@@ -860,27 +1147,17 @@ function renderSueldo() {
       </table>
     </div>`;
 
-  container.querySelectorAll(".sueldo-form").forEach((f) => {
-    f.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const empresaId = f.dataset.empresaId;
-      const mesPago = f.querySelector(".s-mes").value;
-      const periodoEl = f.querySelector(".s-periodo");
-      const periodoPagado = periodoEl ? periodoEl.value.trim() : "";
-      const brutoEl = f.querySelector(".s-bruto");
-      const netoEl = f.querySelector(".s-neto");
-      const nineraEl = f.querySelector(".s-ninera");
-      const comedorEl = f.querySelector(".s-comedor");
-      const bruto = brutoEl ? parseFloat(brutoEl.value) || 0 : 0;
-      const neto = netoEl ? parseFloat(netoEl.value) || 0 : 0;
-      const ninera = nineraEl ? parseFloat(nineraEl.value) || 0 : 0;
-      const comedor = comedorEl ? parseFloat(comedorEl.value) || 0 : 0;
-      const pagoHaberes = parseFloat(f.querySelector(".s-haberes").value);
-      if (!mesPago || !pagoHaberes) return;
-      await addDoc(col("sueldos"), {
-        empresaId, mesPago, periodoPagado, bruto, neto, ninera, comedor, pagoHaberes,
-        createdAt: serverTimestamp()
-      });
+  // Cualquier celda editable de sueldo: guarda directo (upsert por empresa+mes)
+  container.querySelectorAll(".sueldo-field-input").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const empresaId = input.dataset.empresaId;
+      const month = input.dataset.month;
+      const field = input.dataset.field;
+      const emp = empresas.find((e) => e.id === empresaId);
+      const ocultos = emp ? camposOcultosFor(emp) : [];
+      const soloManual = ocultos.includes("neto") && ocultos.includes("ninera") && ocultos.includes("comedor");
+      const value = field === "periodoPagado" ? input.value.trim() : (parseFloat(input.value) || 0);
+      await guardarSueldoCelda(empresaId, month, field, value, soloManual);
     });
   });
 
@@ -895,17 +1172,78 @@ function renderSueldo() {
       await guardarCamposOcultos(empresaId, Array.from(ocultosActuales));
     });
   });
+
+  // Nombre de empresa editable
+  container.querySelectorAll(".empresa-nombre-edit").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const nombre = input.value.trim();
+      if (!nombre) return;
+      await updateDoc(doc(db, "pins", currentPin, "empresas", input.dataset.id), { nombre });
+    });
+  });
+
+  // Mostrar/ocultar el panel de "Campos visibles"
+  container.querySelectorAll(".campos-toggle-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.getElementById("campos-panel-" + btn.dataset.empresaId).classList.toggle("hidden");
+    });
+  });
+
+  renderIngresosExtra(months);
+}
+
+function renderIngresosExtra(months) {
+  const table = document.getElementById("ingresos-extra-table");
+  if (categoriasIngreso.length === 0) {
+    table.innerHTML = `<tbody><tr><td class="empty-state">Todavía no creaste ninguna categoría. Usá el formulario de arriba (ej: "Papá", "Flor", "Adelanto").</td></tr></tbody>`;
+    return;
+  }
+
+  const thead = `<tr><th>Categoría</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}<th></th></tr>`;
+
+  const rows = categoriasIngreso.map((cat) => {
+    const cells = months.map((mk) => {
+      const entry = ingresoEntryFor(cat.id, mk);
+      const monto = entry ? entry.monto || 0 : 0;
+      const negClass = monto < 0 ? "negative-cell" : "";
+      return `<td class="amount editable-cell ${negClass}"><input type="number" step="0.01" class="ingreso-extra-input" data-cat="${cat.id}" data-month="${mk}" value="${monto || ""}" placeholder="0" /></td>`;
+    }).join("");
+    return `<tr><td class="row-label">${escapeHtml(cat.nombre)}</td>${cells}<td class="row-delete"><button data-collection="categoriasIngreso" data-id="${cat.id}" aria-label="Eliminar">×</button></td></tr>`;
+  }).join("");
+
+  const totalCells = months.map((mk) => {
+    const total = categoriasIngreso.reduce((s, c) => s + categoriaIngresoTotalForMonth(c.id, mk), 0);
+    return `<td class="amount ${total < 0 ? "negative-cell" : ""}">${money(total)}</td>`;
+  }).join("");
+
+  table.innerHTML = `<thead>${thead}</thead><tbody>${rows}<tr class="total-row"><td class="row-label">Total ingresos extra</td>${totalCells}<td></td></tr></tbody>`;
+
+  table.querySelectorAll(".ingreso-extra-input").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const monto = parseFloat(input.value) || 0;
+      await guardarIngresoCelda(input.dataset.cat, input.dataset.month, monto);
+    });
+  });
 }
 
 /* =========================================================
    GASTOS (resumen general)
    ========================================================= */
-document.getElementById("categoria-form").addEventListener("submit", async (e) => {
+document.getElementById("gasto-nuevo-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const nombre = document.getElementById("categoria-nombre").value.trim();
-  if (!nombre || !currentPin) return;
-  await addDoc(col("categoriasGasto"), { nombre, createdAt: serverTimestamp() });
+  if (!currentPin) return;
+  const detalle = document.getElementById("gn-detalle").value.trim();
+  const monto = parseFloat(document.getElementById("gn-monto").value);
+  const month = document.getElementById("gn-mes").value;
+  if (!detalle || !monto || !month) return;
+
+  const catRef = await addDoc(col("categoriasGasto"), { nombre: detalle, createdAt: serverTimestamp() });
+  await setDoc(doc(db, "pins", currentPin, "gastos", gastoDocId(catRef.id, month, "ARS")), {
+    categoriaId: catRef.id, month, moneda: "ARS", monto, vencimiento: "", pagado: false
+  });
+
   e.target.reset();
+  document.getElementById("gn-mes").value = currentMonthKey();
 });
 
 document.getElementById("categoria-ingreso-form").addEventListener("submit", async (e) => {
@@ -995,14 +1333,6 @@ function renderGastos() {
     }).join("");
     rows.push(`<tr><td class="row-label">${escapeHtml(emp.nombre)}</td>${cells}</tr>`);
   });
-  categoriasIngreso.forEach((cat) => {
-    const cells = months.map((mk) => {
-      const entry = ingresoEntryFor(cat.id, mk);
-      const monto = entry ? entry.monto || 0 : 0;
-      return `<td class="amount editable-cell"><input type="number" step="0.01" class="ingreso-monto-input" data-cat="${cat.id}" data-month="${mk}" value="${monto || ""}" placeholder="0" /></td>`;
-    }).join("");
-    rows.push(`<tr><td class="row-label">${escapeHtml(cat.nombre)} <button class="row-inline-delete" data-collection="categoriasIngreso" data-id="${cat.id}" title="Eliminar categoría">×</button></td>${cells}</tr>`);
-  });
 
   const ingresosTotalCells = months.map((mk) => {
     const total = empresas.reduce((s, e) => s + pagoHaberesForMonth(e.id, mk), 0) + otrosIngresosForMonth(mk);
@@ -1075,13 +1405,6 @@ function renderGastos() {
     });
   });
 
-  document.querySelectorAll(".ingreso-monto-input").forEach((input) => {
-    input.addEventListener("change", async () => {
-      const monto = parseFloat(input.value) || 0;
-      await guardarIngresoCelda(input.dataset.cat, input.dataset.month, monto);
-    });
-  });
-
   document.querySelectorAll(".gasto-monto-input").forEach((input) => {
     input.addEventListener("change", async () => {
       const monto = parseFloat(input.value) || 0;
@@ -1096,40 +1419,6 @@ function renderGastos() {
   document.querySelectorAll(".gasto-pagado-input").forEach((input) => {
     input.addEventListener("change", async () => {
       await guardarGastoCelda(input.dataset.cat, input.dataset.month, "ARS", { pagado: input.checked });
-    });
-  });
-
-  renderResumenUSD(months);
-}
-
-function renderResumenUSD(months) {
-  const table = document.getElementById("resumen-usd-table");
-  if (categorias.length === 0) {
-    table.innerHTML = `<tbody><tr><td class="empty-state">Creá primero una categoría de gasto para poder cargar montos en dólares.</td></tr></tbody>`;
-    return;
-  }
-
-  const thead = `<tr><th>Categoría (USD)</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}</tr>`;
-  const rows = categorias.map((c) => {
-    const cells = months.map((mk) => {
-      const entry = gastoEntryFor(c.id, mk, "USD");
-      const monto = entry ? entry.monto || 0 : 0;
-      return `<td class="amount editable-cell"><input type="number" step="0.01" class="gasto-usd-input" data-cat="${c.id}" data-month="${mk}" value="${monto || ""}" placeholder="0" /></td>`;
-    }).join("");
-    return `<tr><td class="row-label">${escapeHtml(c.nombre)}</td>${cells}</tr>`;
-  }).join("");
-
-  const totalCells = months.map((mk) => {
-    const total = categorias.reduce((s, c) => s + categoriaTotalUSDForMonth(c.id, mk), 0);
-    return `<td class="amount">${moneyUSD(total)}</td>`;
-  }).join("");
-
-  table.innerHTML = `<thead>${thead}</thead><tbody>${rows}<tr class="total-row"><td class="row-label">Total USD</td>${totalCells}</tr></tbody>`;
-
-  table.querySelectorAll(".gasto-usd-input").forEach((input) => {
-    input.addEventListener("change", async () => {
-      const monto = parseFloat(input.value) || 0;
-      await guardarGastoCelda(input.dataset.cat, input.dataset.month, "USD", { monto });
     });
   });
 }
