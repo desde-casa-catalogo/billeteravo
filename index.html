@@ -630,8 +630,6 @@ input, select { font-family: var(--font-body); }
 
       <div id="empresas-container"></div>
 
-      <div class="grand-total-wrap" id="sueldo-grand-total"></div>
-
       <div class="section-divider">Ingresos Extra</div>
       <p style="font-size:.82rem;color:var(--muted);margin:-.5rem 0 .8rem">Quién te paga, reintegros, adelantos, etc. Los montos negativos restan (ej: "-100000" para un adelanto).</p>
       <div class="mini-form-bar">
@@ -1378,7 +1376,7 @@ async function guardarSueldoCelda(empresaId, month, field, value, soloManual) {
 
 const SUELDO_FIELD_DEFS = [
   { key: "bruto", label: "Bruto" },
-  { key: "neto", label: "Neto sin comedor" },
+  { key: "neto", label: "Neto" },
   { key: "ninera", label: "Niñera" },
   { key: "comedor", label: "Comedor" },
   { key: "aguinaldo", label: "Aguinaldo" },
@@ -1404,7 +1402,6 @@ function renderSueldo() {
 
   if (empresas.length === 0) {
     container.innerHTML = `<div class="empty-state">Todavía no creaste ninguna empresa. Usá el formulario de arriba.</div>`;
-    document.getElementById("sueldo-grand-total").innerHTML = "";
     return;
   }
 
@@ -1441,7 +1438,7 @@ function renderSueldo() {
         const neto = Math.round(bruto * 0.83);
         return `<td class="amount ${neto ? "" : "muted"}">${neto ? money(neto) : "—"}</td>`;
       }).join("");
-      return `<tr><td class="row-label">Neto (auto: 83% del bruto)</td>${cells}<td></td></tr>`;
+      return `<tr><td class="row-label">Neto</td>${cells}<td></td></tr>`;
     }
 
     function pagoHaberesRow() {
@@ -1456,7 +1453,7 @@ function renderSueldo() {
     const rows = [
       !ocultos.includes("periodo") ? fieldRow("periodoPagado", "Período trabajado", false, false) : "",
       !ocultos.includes("bruto") ? fieldRow("bruto", "Bruto") : "",
-      !ocultos.includes("neto") ? (soloManual ? fieldRow("neto", "Neto sin comedor") : netoAutoRow()) : "",
+      !ocultos.includes("neto") ? (soloManual ? fieldRow("neto", "Neto") : netoAutoRow()) : "",
       !ocultos.includes("comedor") ? fieldRow("comedor", "Comedor (− resta)") : "",
       !ocultos.includes("ninera") ? fieldRow("ninera", "Niñera (+ suma)") : "",
       !ocultos.includes("aguinaldo") ? fieldRow("aguinaldo", "Aguinaldo (+ suma, no se repite)", true, false) : "",
@@ -1489,18 +1486,6 @@ function renderSueldo() {
   }).join("");
 
   container.innerHTML = `<div class="empresas-grid">${bloques}</div>`;
-
-  const grandCells = months.map((mk) => {
-    const total = empresas.reduce((s, e) => s + pagoHaberesForMonth(e.id, mk), 0);
-    return `<td class="amount">${money(total)}</td>`;
-  }).join("");
-  document.getElementById("sueldo-grand-total").innerHTML = `
-    <div class="matrix-wrap">
-      <table class="matrix-table">
-        <thead><tr><th>Total bolsillo</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}</tr></thead>
-        <tbody><tr class="total-row"><td class="row-label">Total</td>${grandCells}</tr></tbody>
-      </table>
-    </div>`;
 
   // Cualquier celda editable de sueldo: guarda directo (upsert por empresa+mes)
   container.querySelectorAll(".sueldo-field-input").forEach((input) => {
@@ -1784,13 +1769,11 @@ function renderGastos() {
     </td>`;
 
   rows.push(`<tr class="section-row"><td class="row-label">Ingresos</td>${months.map(() => "<td></td>").join("")}<td></td></tr>`);
-  empresas.forEach((emp) => {
-    const cells = months.map((mk) => {
-      const v = pagoHaberesForMonth(emp.id, mk);
-      return `<td class="amount ${v ? "" : "muted"}">${v ? money(v) : "—"}</td>`;
-    }).join("");
-    rows.push(`<tr><td class="row-label">${escapeHtml(emp.nombre)}</td>${cells}${diaCell(emp.diaCobro, "empresas", emp.id)}</tr>`);
-  });
+  const sueldoVirCells = months.map((mk) => {
+    const v = empresas.reduce((s, e) => s + pagoHaberesForMonth(e.id, mk), 0);
+    return `<td class="amount ${v ? "" : "muted"}">${v ? money(v) : "—"}</td>`;
+  }).join("");
+  rows.push(`<tr><td class="row-label">SUELDO VIR <span style="font-size:.68rem;color:var(--muted);font-weight:400">(se edita en Ingresos)</span></td>${sueldoVirCells}<td></td></tr>`);
   const ingresoExtraCells = months.map((mk) => {
     const v = otrosIngresosForMonth(mk);
     return `<td class="amount ${v < 0 ? "negative-cell" : v ? "" : "muted"}">${v ? money(v) : "—"}</td>`;
@@ -1940,7 +1923,7 @@ document.getElementById("app-screen").addEventListener("keydown", (e) => {
 
 /* ---------- Delegated delete for all lists ---------- */
 document.getElementById("app-screen").addEventListener("click", async (e) => {
-  const btn = e.target.closest("[data-collection][data-id]");
+  const btn = e.target.closest("button[data-collection][data-id]");
   if (!btn || !currentPin) return;
   await deleteDoc(doc(db, "pins", currentPin, btn.dataset.collection, btn.dataset.id));
 });
