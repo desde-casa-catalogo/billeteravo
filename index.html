@@ -1334,25 +1334,37 @@ document.getElementById("empresa-form").addEventListener("submit", async (e) => 
   e.target.reset();
 });
 
-function pagoHaberesForMonth(empresaId, monthKey) {
-  return sueldos
-    .filter((s) => s.empresaId === empresaId && s.mesPago === monthKey)
-    .reduce((sum, s) => sum + (s.pagoHaberes || 0), 0);
-}
-
 function sueldoDocId(empresaId, month) { return `${empresaId}_${month}`; }
 function sueldoEntryFor(empresaId, month) {
-  return sueldos.find((s) => s.empresaId === empresaId && s.mesPago === month) || null;
+  const id = sueldoDocId(empresaId, month);
+  return sueldos.find((s) => s.id === id) || null;
+}
+// El registro "vigente" para un mes: el de ese mes exacto si existe, sino el más reciente de un mes anterior (se repite hacia adelante)
+function sueldoEntryEfectivo(empresaId, monthKey) {
+  const exacto = sueldoEntryFor(empresaId, monthKey);
+  if (exacto) return exacto;
+  const candidatos = sueldos
+    .filter((s) => s.empresaId === empresaId && s.mesPago < monthKey)
+    .sort((a, b) => (a.mesPago < b.mesPago ? 1 : -1));
+  return candidatos[0] || null;
+}
+function pagoHaberesForMonth(empresaId, monthKey) {
+  const entry = sueldoEntryEfectivo(empresaId, monthKey);
+  return entry ? entry.pagoHaberes || 0 : 0;
 }
 async function guardarSueldoCelda(empresaId, month, field, value, soloManual) {
   if (!currentPin) return;
-  const existing = sueldoEntryFor(empresaId, month) || {};
-  const merged = { ...existing, empresaId, mesPago: month, [field]: value };
-  if (!soloManual && field === "bruto") {
-    merged.neto = Math.round(value * 0.83);
-  }
-  if (!soloManual && (field === "bruto" || field === "neto" || field === "ninera" || field === "comedor")) {
-    merged.pagoHaberes = (merged.neto || 0) + (merged.ninera || 0) - (merged.comedor || 0);
+  const exacto = sueldoEntryFor(empresaId, month); // sin cascada
+  const base = exacto || sueldoEntryEfectivo(empresaId, month) || {};
+  // Si este mes se crea a partir de un mes anterior (cascada), el aguinaldo NUNCA se arrastra
+  const baseSegura = exacto ? base : { ...base, aguinaldo: 0 };
+  const merged = { ...baseSegura, empresaId, mesPago: month, [field]: value };
+  if (!soloManual) {
+    const netoLive = Math.round((merged.bruto || 0) * 0.83);
+    merged.neto = netoLive; // guardado de referencia
+    if (field === "bruto" || field === "neto" || field === "ninera" || field === "comedor" || field === "aguinaldo") {
+      merged.pagoHaberes = netoLive + (merged.ninera || 0) - (merged.comedor || 0) + (merged.aguinaldo || 0);
+    }
   }
   const ref = doc(db, "pins", currentPin, "sueldos", sueldoDocId(empresaId, month));
   await setDoc(ref, merged, { merge: true });
@@ -1363,14 +1375,15 @@ const SUELDO_FIELD_DEFS = [
   { key: "neto", label: "Neto sin comedor" },
   { key: "ninera", label: "Niñera" },
   { key: "comedor", label: "Comedor" },
+  { key: "aguinaldo", label: "Aguinaldo" },
   { key: "periodo", label: "Período trabajado" },
 ];
 
 function defaultHiddenFieldsFor(nombre) {
   const n = (nombre || "").trim().toLowerCase();
-  if (n === "club") return ["neto", "ninera", "comedor"];
-  if (n === "city") return ["neto", "periodo"];
-  return [];
+  if (n === "club") return ["neto", "ninera", "comedor", "aguinaldo"];
+  if (n === "city") return ["neto", "periodo", "aguinaldo"];
+  return ["aguinaldo"];
 }
 function camposOcultosFor(emp) {
   return Array.isArray(emp.camposOcultos) ? emp.camposOcultos : defaultHiddenFieldsFor(emp.nombre);
@@ -1402,9 +1415,9 @@ function renderSueldo() {
         ${f.label}
       </label>`).join("");
 
-    function fieldRow(field, label, isNumber = true) {
+    function fieldRow(field, label, isNumber = true, cascada = true) {
       const cells = months.map((mk) => {
-        const entry = sueldoEntryFor(emp.id, mk);
+        const entry = cascada ? sueldoEntryEfectivo(emp.id, mk) : sueldoEntryFor(emp.id, mk);
         const val = entry ? entry[field] : "";
         if (isNumber) {
           return `<td class="amount editable-cell"><input type="text" inputmode="numeric" class="sueldo-field-input money-fmt-input" data-empresa-id="${emp.id}" data-month="${mk}" data-field="${field}" value="${formatIntEs(val)}" placeholder="0" /></td>`;
@@ -1414,9 +1427,20 @@ function renderSueldo() {
       return `<tr><td class="row-label">${label}</td>${cells}<td></td></tr>`;
     }
 
+    // Neto en modo automático: se calcula en vivo (bruto × 0.83) sobre el bruto vigente (con cascada)
+    function netoAutoRow() {
+      const cells = months.map((mk) => {
+        const entry = sueldoEntryEfectivo(emp.id, mk);
+        const bruto = entry ? entry.bruto || 0 : 0;
+        const neto = Math.round(bruto * 0.83);
+        return `<td class="amount ${neto ? "" : "muted"}">${neto ? money(neto) : "—"}</td>`;
+      }).join("");
+      return `<tr><td class="row-label">Neto (auto: 83% del bruto)</td>${cells}<td></td></tr>`;
+    }
+
     function pagoHaberesRow() {
       const cells = months.map((mk) => {
-        const entry = sueldoEntryFor(emp.id, mk);
+        const entry = sueldoEntryEfectivo(emp.id, mk);
         const val = entry ? entry.pagoHaberes || 0 : 0;
         return `<td class="amount editable-cell"><input type="text" inputmode="numeric" class="sueldo-field-input money-fmt-input" data-empresa-id="${emp.id}" data-month="${mk}" data-field="pagoHaberes" value="${formatIntEs(val)}" placeholder="0" /></td>`;
       }).join("");
@@ -1424,11 +1448,12 @@ function renderSueldo() {
     }
 
     const rows = [
-      !ocultos.includes("periodo") ? fieldRow("periodoPagado", "Período trabajado", false) : "",
+      !ocultos.includes("periodo") ? fieldRow("periodoPagado", "Período trabajado", false, false) : "",
       !ocultos.includes("bruto") ? fieldRow("bruto", "Bruto") : "",
-      !ocultos.includes("neto") ? fieldRow("neto", soloManual ? "Neto sin comedor" : "Neto (auto: 83% del bruto)") : "",
+      !ocultos.includes("neto") ? (soloManual ? fieldRow("neto", "Neto sin comedor") : netoAutoRow()) : "",
       !ocultos.includes("comedor") ? fieldRow("comedor", "Comedor (− resta)") : "",
       !ocultos.includes("ninera") ? fieldRow("ninera", "Niñera (+ suma)") : "",
+      !ocultos.includes("aguinaldo") ? fieldRow("aguinaldo", "Aguinaldo (+ suma, no se repite)", true, false) : "",
       pagoHaberesRow(),
     ].join("");
 
@@ -1759,13 +1784,11 @@ function renderGastos() {
     }).join("");
     rows.push(`<tr><td class="row-label">${escapeHtml(emp.nombre)}</td>${cells}${diaCell(emp.diaCobro, "empresas", emp.id)}</tr>`);
   });
-  categoriasIngreso.forEach((cat) => {
-    const cells = months.map((mk) => {
-      const v = categoriaIngresoTotalForMonth(cat.id, mk);
-      return `<td class="amount ${v < 0 ? "negative-cell" : v ? "" : "muted"}">${v ? money(v) : "—"}</td>`;
-    }).join("");
-    rows.push(`<tr><td class="row-label">${escapeHtml(cat.nombre)} <span style="font-size:.68rem;color:var(--muted);font-weight:400">(se edita en Ingresos)</span></td>${cells}<td></td></tr>`);
-  });
+  const ingresoExtraCells = months.map((mk) => {
+    const v = otrosIngresosForMonth(mk);
+    return `<td class="amount ${v < 0 ? "negative-cell" : v ? "" : "muted"}">${v ? money(v) : "—"}</td>`;
+  }).join("");
+  rows.push(`<tr><td class="row-label">Ingresos Extra <span style="font-size:.68rem;color:var(--muted);font-weight:400">(se edita en Ingresos)</span></td>${ingresoExtraCells}<td></td></tr>`);
 
   const ingresosTotalCells = months.map((mk) => {
     const total = empresas.reduce((s, e) => s + pagoHaberesForMonth(e.id, mk), 0) + otrosIngresosForMonth(mk);
