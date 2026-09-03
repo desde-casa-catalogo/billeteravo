@@ -324,6 +324,77 @@ input, select { font-family: var(--font-body); }
   font-size: .85rem;
 }
 
+.empresas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 1.1rem;
+  align-items: start;
+}
+.empresa-card { margin-bottom: 0; }
+
+/* ===== Ingresos Extra: fila expandible con flecha ===== */
+.ie-toggle-arrow {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: .85rem;
+  cursor: pointer;
+  padding: 0 .3rem 0 0;
+  vertical-align: middle;
+}
+.matrix-table tr.ie-cat-row td.row-label { cursor: default; }
+.matrix-table tr.ie-detalle-row td {
+  background: var(--paper) !important;
+  padding: 0;
+  text-align: left;
+}
+.ie-detalle-panel { padding: 1rem 1.2rem 1.2rem 2.2rem; }
+.ie-quick-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: .8rem;
+}
+.ie-quick-form input {
+  padding: .5rem .65rem;
+  border: 1px solid var(--paper-line);
+  border-radius: 6px;
+  font-size: .85rem;
+  background: var(--white);
+  color: var(--ink);
+}
+.ie-quick-form .ie-detalle { flex: 1; min-width: 140px; }
+.ie-quick-form .ie-monto { width: 130px; }
+.ie-quick-form .ie-mes { width: 150px; }
+.ie-quick-form button {
+  padding: .5rem 1rem;
+  background: var(--gold);
+  border: none;
+  border-radius: 6px;
+  color: var(--white);
+  font-size: .82rem;
+  font-weight: 600;
+}
+.ie-entries-list { display: flex; flex-direction: column; gap: .3rem; }
+.ie-entry-row {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  padding: .45rem .6rem;
+  background: var(--white);
+  border-radius: 6px;
+  border: 1px solid var(--paper-line);
+}
+.ie-entry-label { flex: 1; font-size: .85rem; color: var(--ink); text-align: left; }
+.ie-entry-monto { font-family: var(--font-mono); font-weight: 700; font-size: .9rem; }
+.ie-entry-row button {
+  background: none;
+  border: none;
+  color: var(--paper-line);
+  font-size: .95rem;
+}
+.ie-entry-row button:hover { color: var(--expense); }
+
 /* ===== Pretty cards: Impuestos / Gastos Fijos / Billetera ===== */
 .two-col-forms {
   display: grid;
@@ -572,7 +643,6 @@ input, select { font-family: var(--font-body); }
       <div class="matrix-wrap">
         <table class="matrix-table" id="ingresos-extra-table"></table>
       </div>
-      <div id="ingresos-extra-detalle"></div>
     </section>
 
     <!-- ===================== GASTOS ===================== -->
@@ -601,7 +671,7 @@ input, select { font-family: var(--font-body); }
           <form id="impuesto-nuevo-form">
             <input type="text" id="in-detalle" placeholder="Detalle (ej: Patente)" required />
             <div class="pretty-card-row">
-              <input type="number" id="in-monto" step="0.01" min="0" required placeholder="Monto $" />
+              <input type="text" inputmode="numeric" id="in-monto" class="money-fmt-input" required placeholder="Monto $" />
               <input type="month" id="in-mes" required />
             </div>
             <label class="pretty-card-check">
@@ -618,7 +688,7 @@ input, select { font-family: var(--font-body); }
           <form id="gasto-nuevo-form">
             <input type="text" id="gn-detalle" placeholder="Detalle (ej: Alquiler)" required />
             <div class="pretty-card-row">
-              <input type="number" id="gn-monto" step="0.01" min="0" required placeholder="Monto $" />
+              <input type="text" inputmode="numeric" id="gn-monto" class="money-fmt-input" required placeholder="Monto $" />
               <input type="month" id="gn-mes" required />
             </div>
             <label class="pretty-card-check">
@@ -638,7 +708,7 @@ input, select { font-family: var(--font-body); }
         <form id="billetera-form">
           <div class="pretty-card-row">
             <input type="text" id="bw-detalle" placeholder="Ej: Verdulería" required />
-            <input type="number" id="bw-monto" step="0.01" min="0" required placeholder="Monto $" />
+            <input type="text" inputmode="numeric" id="bw-monto" class="money-fmt-input" required placeholder="Monto $" />
           </div>
           <button type="submit">+ Agregar a la billetera</button>
         </form>
@@ -698,6 +768,16 @@ function money(n) {
   const sign = n < 0 ? "-" : "";
   return sign + "$" + Math.abs(n).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
+// Para inputs de texto que se formatean solos con puntos de miles (ej: "12.000") mientras se escriben
+function formatIntEs(n) {
+  n = Math.round(n || 0);
+  return n === 0 ? "" : n.toLocaleString("es-ES");
+}
+function parseIntEs(str) {
+  if (!str) return 0;
+  const cleaned = String(str).replace(/\./g, "").replace(",", ".").replace(/[^\d.-]/g, "");
+  return parseFloat(cleaned) || 0;
+}
 function currentMonthKey() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -717,7 +797,7 @@ function escapeHtml(str) {
   div.textContent = str || "";
   return div.innerHTML;
 }
-const MONTH_OFFSETS = [0, 1, 2, 3, 4];
+const MONTH_OFFSETS = [0, 1, 2, 3];
 let showArchivedGastos = false;
 
 // Rango estándar: siempre desde el mes real, 5 meses. Usado en Tarjetas y Sueldo (no se archiva).
@@ -1027,9 +1107,9 @@ function renderTarjetas() {
         const valor = cuotaMontoEfectivo(c, mk);
         return `<td class="amount editable-cell">
           ${esUSD ? '<span style="font-size:.68rem;color:var(--income);font-weight:700">US$</span>' : ""}
-          <input type="number" step="0.01" class="cuota-input ${override ? "edited" : ""} ${esUSD ? "cuota-usd" : ""}"
+          <input type="text" inputmode="numeric" class="cuota-input money-fmt-input ${override ? "edited" : ""} ${esUSD ? "cuota-usd" : ""}"
             data-compra-id="${c.id}" data-month="${mk}" data-calculado="${calculado}"
-            value="${valor || ""}" placeholder="0" title="${override ? (c.recurrente ? "Editado — se copia a los meses siguientes" : "Editado a mano") : "Calculado automáticamente"}" />
+            value="${formatIntEs(valor)}" placeholder="0" title="${override ? (c.recurrente ? "Editado — se copia a los meses siguientes" : "Editado a mano") : "Calculado automáticamente"}" />
         </td>`;
       }).join("");
       const cuotasCell = c.recurrente
@@ -1041,7 +1121,7 @@ function renderTarjetas() {
             <input type="date" class="compra-edit" data-id="${c.id}" data-field="fecha" value="${c.fecha || ""}" style="border:1px solid var(--paper-line);border-radius:4px;padding:.3rem .35rem;font-size:.92rem;width:140px" />
           </td>
           <td class="amount editable-cell" style="text-align:center">
-            <span class="dollar-prefix">$</span><input type="number" step="0.01" min="0" class="compra-edit" data-id="${c.id}" data-field="montoTotal" value="${c.montoTotal}" style="width:100px;text-align:right;border:1px solid var(--paper-line);border-radius:4px;padding:.3rem .4rem;font-family:var(--font-mono);font-size:.95rem;font-weight:700" />
+            <span class="dollar-prefix">$</span><input type="text" inputmode="numeric" class="compra-edit money-fmt-input" data-id="${c.id}" data-field="montoTotal" value="${formatIntEs(c.montoTotal)}" style="width:100px;text-align:right;border:1px solid var(--paper-line);border-radius:4px;padding:.3rem .4rem;font-family:var(--font-mono);font-size:.95rem;font-weight:700" />
           </td>
           <td class="amount" style="text-align:center">${cuotasCell}</td>
           <td class="row-label">
@@ -1060,7 +1140,7 @@ function renderTarjetas() {
 
     const comisionCells = months.map((mk) => {
       const val = comisionForMonth(t.id, mk);
-      return `<td class="amount editable-cell"><input type="number" step="0.01" class="comision-input" data-tarjeta-id="${t.id}" data-month="${mk}" value="${val || ""}" placeholder="0" title="Escribí la comisión cuando la sepas" /></td>`;
+      return `<td class="amount editable-cell"><input type="text" inputmode="numeric" class="comision-input money-fmt-input" data-tarjeta-id="${t.id}" data-month="${mk}" value="${formatIntEs(val)}" placeholder="0" title="Escribí la comisión cuando la sepas" /></td>`;
     }).join("");
 
     const totalCells = months.map((mk) => `<td class="amount">${money(tarjetaTotalForMonth(t.id, mk))}</td>`).join("");
@@ -1091,7 +1171,7 @@ function renderTarjetas() {
           <form class="sub-form compra-form" data-tarjeta-id="${t.id}">
             <div class="sf-field sf-desc"><label>Detalle</label><input type="text" class="c-detalle" placeholder="Ej: Heladera" required /></div>
             <div class="sf-field sf-month"><label>Fecha de compra</label><input type="date" class="c-fecha" value="${new Date().toISOString().slice(0, 10)}" required /></div>
-            <div class="sf-field sf-num"><label class="c-total-label">Monto total ($)</label><input type="number" class="c-total" step="0.01" min="0" required /></div>
+            <div class="sf-field sf-num"><label class="c-total-label">Monto total ($)</label><input type="text" inputmode="numeric" class="c-total money-fmt-input" required /></div>
             <div class="sf-field sf-num c-cuotas-field"><label>Cuotas</label><input type="number" class="c-cuotas" min="1" step="1" value="1" required /></div>
             <div class="sf-field sf-month"><label>1ª cuota (nominal, sin vencimiento)</label><input type="month" class="c-mes" value="${currentMonthKey()}" required /></div>
             <div class="sf-field">
@@ -1166,7 +1246,7 @@ function renderTarjetas() {
       const tarjetaId = f.dataset.tarjetaId;
       const detalle = f.querySelector(".c-detalle").value.trim();
       const fecha = f.querySelector(".c-fecha").value;
-      const montoTotal = parseFloat(f.querySelector(".c-total").value);
+      const montoTotal = parseIntEs(f.querySelector(".c-total").value);
       const recurrente = f.querySelector(".c-recurrente").checked;
       const cuotas = recurrente ? 1 : parseInt(f.querySelector(".c-cuotas").value, 10);
       const mesPrimeraCuota = f.querySelector(".c-mes").value;
@@ -1185,7 +1265,7 @@ function renderTarjetas() {
     input.addEventListener("change", async () => {
       const tarjetaId = input.dataset.tarjetaId;
       const month = input.dataset.month;
-      const monto = parseFloat(input.value) || 0;
+      const monto = parseIntEs(input.value);
       const ref = doc(db, "pins", currentPin, "comisiones", `${tarjetaId}_${month}`);
       if (!monto) {
         await deleteDoc(ref).catch(() => {});
@@ -1225,7 +1305,7 @@ function renderTarjetas() {
     input.addEventListener("change", async () => {
       const field = input.dataset.field;
       let value = input.value;
-      if (field === "montoTotal") value = parseFloat(value) || 0;
+      if (field === "montoTotal") value = parseIntEs(value);
       if (field === "cuotas") value = parseInt(value, 10) || 1;
       await updateDoc(doc(db, "pins", currentPin, "compras", input.dataset.id), { [field]: value });
     });
@@ -1237,7 +1317,7 @@ function renderTarjetas() {
       const compraId = input.dataset.compraId;
       const month = input.dataset.month;
       const calculado = parseFloat(input.dataset.calculado);
-      const nuevo = parseFloat(input.value) || 0;
+      const nuevo = parseIntEs(input.value);
       await guardarCuotaOverride(compraId, month, nuevo, calculado);
     });
   });
@@ -1268,7 +1348,10 @@ async function guardarSueldoCelda(empresaId, month, field, value, soloManual) {
   if (!currentPin) return;
   const existing = sueldoEntryFor(empresaId, month) || {};
   const merged = { ...existing, empresaId, mesPago: month, [field]: value };
-  if (!soloManual && (field === "neto" || field === "ninera" || field === "comedor")) {
+  if (!soloManual && field === "bruto") {
+    merged.neto = Math.round(value * 0.83);
+  }
+  if (!soloManual && (field === "bruto" || field === "neto" || field === "ninera" || field === "comedor")) {
     merged.pagoHaberes = (merged.neto || 0) + (merged.ninera || 0) - (merged.comedor || 0);
   }
   const ref = doc(db, "pins", currentPin, "sueldos", sueldoDocId(empresaId, month));
@@ -1306,7 +1389,10 @@ function renderSueldo() {
     return;
   }
 
-  container.innerHTML = empresas.map((emp) => {
+  const paletaEmpresas = ["#1c2541", "#b9863f", "#2f6b4f", "#8a6fc9", "#a6432e"];
+
+  const bloques = empresas.map((emp, idx) => {
+    const color = paletaEmpresas[idx % paletaEmpresas.length];
     const ocultos = camposOcultosFor(emp);
     const soloManual = ocultos.includes("neto") && ocultos.includes("ninera") && ocultos.includes("comedor");
 
@@ -1321,7 +1407,7 @@ function renderSueldo() {
         const entry = sueldoEntryFor(emp.id, mk);
         const val = entry ? entry[field] : "";
         if (isNumber) {
-          return `<td class="amount editable-cell"><input type="number" step="0.01" class="sueldo-field-input" data-empresa-id="${emp.id}" data-month="${mk}" data-field="${field}" value="${val || ""}" placeholder="0" /></td>`;
+          return `<td class="amount editable-cell"><input type="text" inputmode="numeric" class="sueldo-field-input money-fmt-input" data-empresa-id="${emp.id}" data-month="${mk}" data-field="${field}" value="${formatIntEs(val)}" placeholder="0" /></td>`;
         }
         return `<td class="amount editable-cell"><input type="text" class="sueldo-field-input" data-empresa-id="${emp.id}" data-month="${mk}" data-field="${field}" value="${escapeHtml(val || "")}" placeholder="—" style="font-size:.74rem;text-align:center" /></td>`;
       }).join("");
@@ -1332,29 +1418,26 @@ function renderSueldo() {
       const cells = months.map((mk) => {
         const entry = sueldoEntryFor(emp.id, mk);
         const val = entry ? entry.pagoHaberes || 0 : 0;
-        if (soloManual) {
-          return `<td class="amount editable-cell"><input type="number" step="0.01" class="sueldo-field-input" data-empresa-id="${emp.id}" data-month="${mk}" data-field="pagoHaberes" value="${val || ""}" placeholder="0" /></td>`;
-        }
-        return `<td class="amount ${val ? "" : "muted"}">${val ? money(val) : "—"}</td>`;
+        return `<td class="amount editable-cell"><input type="text" inputmode="numeric" class="sueldo-field-input money-fmt-input" data-empresa-id="${emp.id}" data-month="${mk}" data-field="pagoHaberes" value="${formatIntEs(val)}" placeholder="0" /></td>`;
       }).join("");
-      return `<tr class="total-row"><td class="row-label">${soloManual ? "Pago haberes" : "Pago haberes (auto)"}</td>${cells}<td></td></tr>`;
+      return `<tr class="total-row"><td class="row-label">Pago haberes ${!soloManual ? "(auto)" : ""}</td>${cells}<td></td></tr>`;
     }
 
     const rows = [
       !ocultos.includes("periodo") ? fieldRow("periodoPagado", "Período trabajado", false) : "",
       !ocultos.includes("bruto") ? fieldRow("bruto", "Bruto") : "",
-      !ocultos.includes("neto") ? fieldRow("neto", "Neto sin comedor") : "",
-      !ocultos.includes("ninera") ? fieldRow("ninera", "Niñera (+ suma)") : "",
+      !ocultos.includes("neto") ? fieldRow("neto", soloManual ? "Neto sin comedor" : "Neto (auto: 83% del bruto)") : "",
       !ocultos.includes("comedor") ? fieldRow("comedor", "Comedor (− resta)") : "",
+      !ocultos.includes("ninera") ? fieldRow("ninera", "Niñera (+ suma)") : "",
       pagoHaberesRow(),
     ].join("");
 
     const thead = `<tr><th>Concepto</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}<th></th></tr>`;
 
     return `
-      <div class="group-block">
-        <div class="group-header">
-          <input type="text" class="empresa-nombre-edit nombre-titulo-edit" data-id="${emp.id}" value="${escapeHtml(emp.nombre)}" />
+      <div class="group-block empresa-card" style="border-top:5px solid ${color}">
+        <div class="group-header" style="border-bottom-color:${color}">
+          <input type="text" class="empresa-nombre-edit nombre-titulo-edit" data-id="${emp.id}" value="${escapeHtml(emp.nombre)}" style="color:${color}" />
           <button class="group-delete" data-collection="empresas" data-id="${emp.id}">Eliminar empresa</button>
         </div>
         <div class="group-body">
@@ -1373,6 +1456,8 @@ function renderSueldo() {
         </div>
       </div>`;
   }).join("");
+
+  container.innerHTML = `<div class="empresas-grid">${bloques}</div>`;
 
   const grandCells = months.map((mk) => {
     const total = empresas.reduce((s, e) => s + pagoHaberesForMonth(e.id, mk), 0);
@@ -1395,7 +1480,7 @@ function renderSueldo() {
       const emp = empresas.find((e) => e.id === empresaId);
       const ocultos = emp ? camposOcultosFor(emp) : [];
       const soloManual = ocultos.includes("neto") && ocultos.includes("ninera") && ocultos.includes("comedor");
-      const value = field === "periodoPagado" ? input.value.trim() : (parseFloat(input.value) || 0);
+      const value = field === "periodoPagado" ? input.value.trim() : parseIntEs(input.value);
       await guardarSueldoCelda(empresaId, month, field, value, soloManual);
     });
   });
@@ -1431,22 +1516,63 @@ function renderSueldo() {
   renderIngresosExtra(months);
 }
 
+let ingresosExtraExpandidos = new Set(); // ids de categorías con el detalle desplegado
+
 function renderIngresosExtra(months) {
   const table = document.getElementById("ingresos-extra-table");
   if (categoriasIngreso.length === 0) {
     table.innerHTML = `<tbody><tr><td class="empty-state">Todavía no creaste ninguna categoría. Usá el formulario de arriba (ej: "Papá", "Flor", "Adelanto").</td></tr></tbody>`;
-    document.getElementById("ingresos-extra-detalle").innerHTML = "";
     return;
   }
 
-  const thead = `<tr><th>Categoría</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}</tr>`;
+  const thead = `<tr><th style="text-align:left">Categoría</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}</tr>`;
 
   const rows = categoriasIngreso.map((cat) => {
+    const abierto = ingresosExtraExpandidos.has(cat.id);
     const cells = months.map((mk) => {
       const total = categoriaIngresoTotalForMonth(cat.id, mk);
       return `<td class="amount ${total < 0 ? "negative-cell" : total ? "" : "muted"}">${total ? money(total) : "—"}</td>`;
     }).join("");
-    return `<tr><td class="row-label">${escapeHtml(cat.nombre)}</td>${cells}</tr>`;
+
+    const rowPrincipal = `
+      <tr class="ie-cat-row" data-cat-id="${cat.id}">
+        <td class="row-label" style="cursor:pointer">
+          <button class="ie-toggle-arrow" data-cat-id="${cat.id}" aria-label="Desplegar">${abierto ? "▾" : "▸"}</button>
+          ${escapeHtml(cat.nombre)}
+          <button class="row-inline-delete" data-collection="categoriasIngreso" data-id="${cat.id}" title="Eliminar categoría">×</button>
+        </td>
+        ${cells}
+      </tr>`;
+
+    if (!abierto) return rowPrincipal;
+
+    const entries = otrosIngresos
+      .filter((o) => o.categoriaId === cat.id)
+      .sort((a, b) => (a.month < b.month ? 1 : -1));
+
+    const entryRows = entries.map((o) => `
+      <div class="ie-entry-row">
+        <span class="ie-entry-label">${formatMonthShort(o.month)}${o.detalle ? ` · ${escapeHtml(o.detalle)}` : ""}</span>
+        <span class="ie-entry-monto ${o.monto < 0 ? "negative-cell" : ""}">${money(o.monto)}</span>
+        <button data-collection="otrosIngresos" data-id="${o.id}" aria-label="Eliminar">×</button>
+      </div>`).join("");
+
+    const detalleRow = `
+      <tr class="ie-detalle-row">
+        <td colspan="${months.length + 1}">
+          <div class="ie-detalle-panel">
+            <form class="ie-quick-form" data-cat-id="${cat.id}">
+              <input type="text" class="ie-detalle" placeholder="Detalle (ej: Luesqtoff store)" />
+              <input type="text" inputmode="numeric" class="ie-monto money-fmt-input" required placeholder="Monto $ (+/-)" />
+              <input type="month" class="ie-mes" value="${currentMonthKey()}" required />
+              <button type="submit">+ Agregar</button>
+            </form>
+            ${entryRows ? `<div class="ie-entries-list">${entryRows}</div>` : `<div class="empty-state">Sin movimientos cargados todavía.</div>`}
+          </div>
+        </td>
+      </tr>`;
+
+    return rowPrincipal + detalleRow;
   }).join("");
 
   const totalCells = months.map((mk) => {
@@ -1456,71 +1582,27 @@ function renderIngresosExtra(months) {
 
   table.innerHTML = `<thead>${thead}</thead><tbody>${rows}<tr class="total-row"><td class="row-label">Total ingresos extra</td>${totalCells}</tr></tbody>`;
 
-  renderIngresosExtraDetalle();
-}
+  table.querySelectorAll(".ie-toggle-arrow").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.catId;
+      if (ingresosExtraExpandidos.has(id)) ingresosExtraExpandidos.delete(id);
+      else ingresosExtraExpandidos.add(id);
+      renderIngresosExtra(months);
+    });
+  });
 
-function renderIngresosExtraDetalle() {
-  const container = document.getElementById("ingresos-extra-detalle");
-  if (categoriasIngreso.length === 0) { container.innerHTML = ""; return; }
-
-  container.innerHTML = categoriasIngreso.map((cat) => {
-    const entries = otrosIngresos
-      .filter((o) => o.categoriaId === cat.id)
-      .sort((a, b) => (a.month < b.month ? 1 : -1));
-
-    const entryRows = entries.map((o) => `
-      <tr>
-        <td class="row-label">${formatMonthShort(o.month)}${o.detalle ? ` · ${escapeHtml(o.detalle)}` : ""}</td>
-        <td class="amount ${o.monto < 0 ? "negative-cell" : ""}">${money(o.monto)}</td>
-        <td class="row-delete"><button data-collection="otrosIngresos" data-id="${o.id}" aria-label="Eliminar">×</button></td>
-      </tr>`).join("");
-
-    const totalCat = otrosIngresos.filter((o) => o.categoriaId === cat.id).reduce((s, o) => s + o.monto, 0);
-
-    return `
-      <div class="group-block">
-        <div class="group-header">
-          <input type="text" class="categoria-ingreso-nombre-edit nombre-titulo-edit" data-id="${cat.id}" value="${escapeHtml(cat.nombre)}" />
-          <button class="group-delete" data-collection="categoriasIngreso" data-id="${cat.id}">Eliminar categoría</button>
-        </div>
-        <div class="group-body">
-          <form class="sub-form ingreso-extra-form" data-cat-id="${cat.id}">
-            <div class="sf-field sf-desc"><label>Detalle</label><input type="text" class="ie-detalle" placeholder="Ej: Luesqtoff store" /></div>
-            <div class="sf-field sf-num"><label>Monto $ (+ suma / − resta)</label><input type="number" class="ie-monto" step="0.01" required placeholder="Ej: -5000" /></div>
-            <div class="sf-field sf-month"><label>Mes</label><input type="month" class="ie-mes" value="${currentMonthKey()}" required /></div>
-            <button type="submit">+ Agregar</button>
-          </form>
-
-          ${entryRows ? `
-          <div class="matrix-wrap">
-            <table class="matrix-table">
-              <thead><tr><th>Mes / Detalle</th><th>Monto</th><th></th></tr></thead>
-              <tbody>${entryRows}<tr class="total-row"><td class="row-label">Total ${escapeHtml(cat.nombre)}</td><td class="amount ${totalCat < 0 ? "negative-cell" : ""}">${money(totalCat)}</td><td></td></tr></tbody>
-            </table>
-          </div>` : `<div class="empty-state">Sin movimientos cargados todavía.</div>`}
-        </div>
-      </div>`;
-  }).join("");
-
-  container.querySelectorAll(".ingreso-extra-form").forEach((f) => {
+  table.querySelectorAll(".ie-quick-form").forEach((f) => {
     f.addEventListener("submit", async (e) => {
       e.preventDefault();
       const categoriaId = f.dataset.catId;
       const detalle = f.querySelector(".ie-detalle").value.trim();
-      const monto = parseFloat(f.querySelector(".ie-monto").value);
+      const monto = parseIntEs(f.querySelector(".ie-monto").value);
       const month = f.querySelector(".ie-mes").value;
       if (!monto || !month || !currentPin) return;
       await addDoc(col("otrosIngresos"), { categoriaId, detalle, monto, month, createdAt: serverTimestamp() });
       f.reset();
       f.querySelector(".ie-mes").value = currentMonthKey();
-    });
-  });
-
-  container.querySelectorAll(".categoria-ingreso-nombre-edit").forEach((input) => {
-    input.addEventListener("change", async () => {
-      const nombre = input.value.trim();
-      if (!nombre || !currentPin) return;
-      await updateDoc(doc(db, "pins", currentPin, "categoriasIngreso", input.dataset.id), { nombre });
     });
   });
 }
@@ -1532,7 +1614,7 @@ document.getElementById("gasto-nuevo-form").addEventListener("submit", async (e)
   e.preventDefault();
   if (!currentPin) return;
   const detalle = document.getElementById("gn-detalle").value.trim();
-  const monto = parseFloat(document.getElementById("gn-monto").value);
+  const monto = parseIntEs(document.getElementById("gn-monto").value);
   const month = document.getElementById("gn-mes").value;
   const esFijo = document.getElementById("gn-fijo").checked;
   if (!detalle || !monto || !month) return;
@@ -1557,7 +1639,7 @@ document.getElementById("impuesto-nuevo-form").addEventListener("submit", async 
   e.preventDefault();
   if (!currentPin) return;
   const detalle = document.getElementById("in-detalle").value.trim();
-  const monto = parseFloat(document.getElementById("in-monto").value);
+  const monto = parseIntEs(document.getElementById("in-monto").value);
   const month = document.getElementById("in-mes").value;
   const esFijo = document.getElementById("in-fijo").checked;
   if (!detalle || !monto || !month) return;
@@ -1582,7 +1664,7 @@ document.getElementById("billetera-form").addEventListener("submit", async (e) =
   e.preventDefault();
   if (!currentPin) return;
   const detalle = document.getElementById("bw-detalle").value.trim();
-  const monto = parseFloat(document.getElementById("bw-monto").value);
+  const monto = parseIntEs(document.getElementById("bw-monto").value);
   if (!detalle || !monto) return;
 
   const fecha = new Date().toISOString().slice(0, 10);
@@ -1677,6 +1759,13 @@ function renderGastos() {
     }).join("");
     rows.push(`<tr><td class="row-label">${escapeHtml(emp.nombre)}</td>${cells}${diaCell(emp.diaCobro, "empresas", emp.id)}</tr>`);
   });
+  categoriasIngreso.forEach((cat) => {
+    const cells = months.map((mk) => {
+      const v = categoriaIngresoTotalForMonth(cat.id, mk);
+      return `<td class="amount ${v < 0 ? "negative-cell" : v ? "" : "muted"}">${v ? money(v) : "—"}</td>`;
+    }).join("");
+    rows.push(`<tr><td class="row-label">${escapeHtml(cat.nombre)} <span style="font-size:.68rem;color:var(--muted);font-weight:400">(se edita en Ingresos)</span></td>${cells}<td></td></tr>`);
+  });
 
   const ingresosTotalCells = months.map((mk) => {
     const total = empresas.reduce((s, e) => s + pagoHaberesForMonth(e.id, mk), 0) + otrosIngresosForMonth(mk);
@@ -1691,9 +1780,9 @@ function renderGastos() {
       const override = pagoTarjetaOverride(t.id, mk);
       const valor = override ? override.monto : calculado;
       return `<td class="amount editable-cell">
-        <input type="number" step="0.01" class="tarjeta-pago-input ${override ? "edited" : ""}"
+        <input type="text" inputmode="numeric" class="tarjeta-pago-input money-fmt-input ${override ? "edited" : ""}"
           data-tarjeta-id="${t.id}" data-month="${mk}" data-calculado="${calculado}"
-          value="${valor || ""}" placeholder="0" title="${override ? "Editado a mano — distinto al total de cuotas" : "Calculado automáticamente. Cambialo si vas a pagar otro monto."}" />
+          value="${formatIntEs(valor)}" placeholder="0" title="${override ? "Editado a mano — distinto al total de cuotas" : "Calculado automáticamente. Cambialo si vas a pagar otro monto."}" />
       </td>`;
     }).join("");
     rows.push(`<tr><td class="row-label">${escapeHtml(t.nombre)}</td>${cells}${diaCell(t.diaVencimiento, "tarjetas", t.id)}</tr>`);
@@ -1704,7 +1793,7 @@ function renderGastos() {
     const cells = months.map((mk) => {
       const entry = gastoEntryFor(c.id, mk, "ARS");
       const monto = entry ? entry.monto || 0 : 0;
-      return `<td class="amount editable-cell"><input type="number" step="0.01" class="gasto-monto-input" data-cat="${c.id}" data-month="${mk}" value="${monto || ""}" placeholder="0" /></td>`;
+      return `<td class="amount editable-cell"><input type="text" inputmode="numeric" class="gasto-monto-input money-fmt-input" data-cat="${c.id}" data-month="${mk}" value="${formatIntEs(monto)}" placeholder="0" /></td>`;
     }).join("");
     rows.push(`<tr><td class="row-label">${escapeHtml(c.nombre)} <button class="row-inline-delete" data-collection="categoriasImpuesto" data-id="${c.id}" title="Eliminar impuesto">×</button></td>${cells}${diaCell(c.diaVencimiento, "categoriasImpuesto", c.id)}</tr>`);
   });
@@ -1714,7 +1803,7 @@ function renderGastos() {
     const cells = months.map((mk) => {
       const entry = gastoEntryFor(c.id, mk, "ARS");
       const monto = entry ? entry.monto || 0 : 0;
-      return `<td class="amount editable-cell"><input type="number" step="0.01" class="gasto-monto-input" data-cat="${c.id}" data-month="${mk}" value="${monto || ""}" placeholder="0" /></td>`;
+      return `<td class="amount editable-cell"><input type="text" inputmode="numeric" class="gasto-monto-input money-fmt-input" data-cat="${c.id}" data-month="${mk}" value="${formatIntEs(monto)}" placeholder="0" /></td>`;
     }).join("");
     rows.push(`<tr><td class="row-label">${escapeHtml(c.nombre)} <button class="row-inline-delete" data-collection="categoriasGasto" data-id="${c.id}" title="Eliminar categoría">×</button></td>${cells}${diaCell(c.diaVencimiento, "categoriasGasto", c.id)}</tr>`);
   });
@@ -1750,14 +1839,14 @@ function renderGastos() {
       const tarjetaId = input.dataset.tarjetaId;
       const month = input.dataset.month;
       const calculado = parseFloat(input.dataset.calculado);
-      const nuevo = parseFloat(input.value) || 0;
+      const nuevo = parseIntEs(input.value);
       await guardarPagoTarjeta(tarjetaId, month, nuevo, calculado);
     });
   });
 
   document.querySelectorAll(".gasto-monto-input").forEach((input) => {
     input.addEventListener("change", async () => {
-      const monto = parseFloat(input.value) || 0;
+      const monto = parseIntEs(input.value);
       await guardarGastoCelda(input.dataset.cat, input.dataset.month, "ARS", { monto });
     });
   });
@@ -1793,6 +1882,20 @@ function renderBilletera() {
   }).join("");
   table.innerHTML = `<thead>${thead}</thead><tbody>${rows}</tbody>`;
 }
+
+/* ---------- Formateo en vivo de todos los campos de monto (puntos de miles) ---------- */
+document.getElementById("app-screen").addEventListener("input", (e) => {
+  const el = e.target;
+  if (!el.classList || !el.classList.contains("money-fmt-input")) return;
+  const cursorFromEnd = el.value.length - el.selectionStart;
+  const raw = el.value.replace(/[^\d-]/g, "");
+  const negative = raw.startsWith("-");
+  const digits = raw.replace(/-/g, "");
+  const formatted = digits === "" ? "" : (negative ? "-" : "") + parseInt(digits, 10).toLocaleString("es-ES");
+  el.value = formatted;
+  const newPos = Math.max(0, formatted.length - cursorFromEnd);
+  el.setSelectionRange(newPos, newPos);
+});
 
 /* ---------- Delegated delete for all lists ---------- */
 document.getElementById("app-screen").addEventListener("click", async (e) => {
