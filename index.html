@@ -764,19 +764,25 @@ let settings = { mesInicio: null }; // ventana de meses visible (archivado manua
 
 /* ---------- Helpers ---------- */
 function money(n) {
-  n = n || 0;
+  n = Math.round(n || 0);
   const sign = n < 0 ? "-" : "";
-  return sign + "$" + Math.abs(n).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  return sign + "$" + agruparMiles(Math.abs(n));
 }
 // Para inputs de texto que se formatean solos con puntos de miles (ej: "12.000") mientras se escriben
+// Agrupa de a miles con puntos, sin depender del soporte de idioma del navegador
+function agruparMiles(numStr) {
+  return String(numStr).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
 function formatIntEs(n) {
   n = Math.round(n || 0);
-  return n === 0 ? "" : n.toLocaleString("es-ES");
+  if (n === 0) return "";
+  const sign = n < 0 ? "-" : "";
+  return sign + agruparMiles(Math.abs(n));
 }
 function parseIntEs(str) {
   if (!str) return 0;
   const cleaned = String(str).replace(/\./g, "").replace(",", ".").replace(/[^\d.-]/g, "");
-  return parseFloat(cleaned) || 0;
+  return Math.round(parseFloat(cleaned) || 0);
 }
 function currentMonthKey() {
   const d = new Date();
@@ -1739,8 +1745,9 @@ function billeteraTotalForMonth(monthKey) {
   return billetera.filter((b) => b.month === monthKey).reduce((s, b) => s + b.monto, 0);
 }
 function moneyUSD(n) {
-  n = n || 0;
-  return "US$ " + n.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  n = Math.round(n || 0);
+  const sign = n < 0 ? "-" : "";
+  return sign + "US$ " + agruparMiles(Math.abs(n));
 }
 function overrideId(tarjetaId, monthKey) { return `${tarjetaId}_${monthKey}`; }
 function pagoTarjetaOverride(tarjetaId, monthKey) {
@@ -1910,14 +1917,25 @@ function renderBilletera() {
 document.getElementById("app-screen").addEventListener("input", (e) => {
   const el = e.target;
   if (!el.classList || !el.classList.contains("money-fmt-input")) return;
+  if (el.value.includes(",")) return; // dejar escribir la coma decimal libremente, se redondea al confirmar
   const cursorFromEnd = el.value.length - el.selectionStart;
   const raw = el.value.replace(/[^\d-]/g, "");
   const negative = raw.startsWith("-");
   const digits = raw.replace(/-/g, "");
-  const formatted = digits === "" ? "" : (negative ? "-" : "") + parseInt(digits, 10).toLocaleString("es-ES");
+  const formatted = digits === "" ? "" : (negative ? "-" : "") + agruparMiles(String(parseInt(digits, 10)));
   el.value = formatted;
   const newPos = Math.max(0, formatted.length - cursorFromEnd);
   el.setSelectionRange(newPos, newPos);
+});
+
+// Enter confirma el valor (redondea decimales y aplica puntos de miles), igual que si perdiera el foco
+document.getElementById("app-screen").addEventListener("keydown", (e) => {
+  const el = e.target;
+  if (!el.classList || !el.classList.contains("money-fmt-input")) return;
+  if (e.key === "Enter") {
+    e.preventDefault();
+    el.blur();
+  }
 });
 
 /* ---------- Delegated delete for all lists ---------- */
