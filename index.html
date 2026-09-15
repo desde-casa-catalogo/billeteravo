@@ -290,26 +290,62 @@ input, select { font-family: var(--font-body); }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
+  gap: 1px;
+  width: 92px;
   height: 44px;
   border-radius: 10px;
   background: linear-gradient(160deg, var(--white), var(--paper));
   border: 1px solid var(--gold);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 2px 5px rgba(28,37,65,.15);
 }
+.dia-sep { color: var(--gold); font-weight: 700; font-size: .95rem; }
+
+.usd-breakdown {
+  margin: .7rem 1rem 0;
+  padding: .8rem 1rem;
+  background: var(--income-soft);
+  border: 1px solid var(--income);
+  border-radius: 8px;
+}
+.usd-breakdown-title {
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-weight: 700;
+  color: var(--income);
+  margin-bottom: .5rem;
+}
+.usd-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .3rem 0;
+  color: var(--income);
+  font-weight: 600;
+  font-size: .85rem;
+  border-bottom: 1px solid rgba(47,107,79,.15);
+}
+.usd-breakdown-row:last-of-type { border-bottom: none; }
+.usd-breakdown-total {
+  margin-top: .3rem;
+  padding-top: .5rem;
+  border-top: 2px solid var(--income);
+  font-weight: 800;
+  font-size: .95rem;
+}
 .dia-input {
-  width: 100%;
+  width: 38px;
   height: 100%;
   border: none;
   background: transparent;
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--gold);
 }
 .dia-input:focus { outline: none; }
-.dia-input::placeholder { color: var(--paper-line); font-weight: 400; }
+.dia-input::placeholder { color: var(--paper-line); font-weight: 400; font-size: .68rem; }
 .matrix-table td.muted { color: var(--muted); }
 .matrix-table td.row-delete { text-align: center; width: 32px; }
 .matrix-table td.row-delete button { background: none; border: none; color: var(--paper-line); font-size: 1rem; }
@@ -496,24 +532,7 @@ input, select { font-family: var(--font-body); }
 .pretty-card-billetera button { background: var(--gold); }
 .pretty-card-billetera button:hover { background: #a3762f; }
 
-/* Signo $ automático en toda celda de monto editable de la app (excepto USD, que ya muestra US$) */
-.matrix-table td.editable-cell { position: relative; }
-.matrix-table td.editable-cell input[type="number"] { padding-left: 1.05rem; }
-.matrix-table td.editable-cell:has(input[type="number"]):not(:has(.cuota-usd))::before {
-  content: "$";
-  position: absolute;
-  left: .55rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--muted);
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: .8rem;
-  pointer-events: none;
-}
-/* La celda de montoTotal ya lleva su propio $ manual (span), no dupliques con el de CSS */
-.matrix-table td.editable-cell:has(.dollar-prefix)::before { content: none; }
-.matrix-table td.editable-cell:has(.dollar-prefix) input[type="number"] { padding-left: .4rem; }
+/* (Se sacó el signo $ automático — ahora los montos van solo con puntos de miles) */
 
 .tarjeta-pago-input, .comision-input {
   width: 100px;
@@ -669,7 +688,7 @@ input, select { font-family: var(--font-body); }
           <form id="impuesto-nuevo-form">
             <input type="text" id="in-detalle" placeholder="Detalle (ej: Patente)" required />
             <div class="pretty-card-row">
-              <input type="text" inputmode="numeric" id="in-monto" class="money-fmt-input" required placeholder="Monto $" />
+              <input type="text" inputmode="numeric" id="in-monto" class="money-fmt-input" required placeholder="Monto" />
               <input type="month" id="in-mes" required />
             </div>
             <label class="pretty-card-check">
@@ -686,7 +705,7 @@ input, select { font-family: var(--font-body); }
           <form id="gasto-nuevo-form">
             <input type="text" id="gn-detalle" placeholder="Detalle (ej: Alquiler)" required />
             <div class="pretty-card-row">
-              <input type="text" inputmode="numeric" id="gn-monto" class="money-fmt-input" required placeholder="Monto $" />
+              <input type="text" inputmode="numeric" id="gn-monto" class="money-fmt-input" required placeholder="Monto" />
               <input type="month" id="gn-mes" required />
             </div>
             <label class="pretty-card-check">
@@ -706,10 +725,16 @@ input, select { font-family: var(--font-body); }
         <form id="billetera-form">
           <div class="pretty-card-row">
             <input type="text" id="bw-detalle" placeholder="Ej: Verdulería" required />
-            <input type="text" inputmode="numeric" id="bw-monto" class="money-fmt-input" required placeholder="Monto $" />
+            <input type="text" inputmode="numeric" id="bw-monto" class="money-fmt-input" required placeholder="Monto" />
           </div>
+          <input type="date" id="bw-fecha" title="Si lo dejás vacío, usa la fecha de hoy" />
           <button type="submit">+ Agregar a la billetera</button>
         </form>
+      </div>
+
+      <div class="mini-form-bar" style="display:flex;align-items:center;gap:.5rem;margin-top:1rem">
+        <label style="font-size:.8rem;color:var(--muted);font-weight:600">Mes:</label>
+        <select id="billetera-mes-filtro"></select>
       </div>
 
       <div class="matrix-wrap">
@@ -764,7 +789,7 @@ let settings = { mesInicio: null }; // ventana de meses visible (archivado manua
 function money(n) {
   n = Math.round(n || 0);
   const sign = n < 0 ? "-" : "";
-  return sign + "$" + agruparMiles(Math.abs(n));
+  return sign + agruparMiles(Math.abs(n));
 }
 // Para inputs de texto que se formatean solos con puntos de miles (ej: "12.000") mientras se escriben
 // Agrupa de a miles con puntos, sin depender del soporte de idioma del navegador
@@ -818,7 +843,7 @@ function gastosEffectiveStartMonth() {
 }
 function gastosMonthRange() {
   if (showArchivedGastos) {
-    const start = addMonths(currentMonthKey(), -12);
+    const start = "2026-08";
     const end = addMonths(currentMonthKey(), 4);
     const result = [];
     let cur = start;
@@ -1110,7 +1135,7 @@ function renderTarjetas() {
           : cuotaMontoForMonth(c, mk);
         const valor = cuotaMontoEfectivo(c, mk);
         return `<td class="amount editable-cell">
-          ${esUSD ? '<span style="font-size:.68rem;color:var(--income);font-weight:700">US$</span>' : ""}
+          ${esUSD ? '<span style="font-size:.68rem;color:var(--income);font-weight:700">USD</span>' : ""}
           <input type="text" inputmode="numeric" class="cuota-input money-fmt-input ${override ? "edited" : ""} ${esUSD ? "cuota-usd" : ""}"
             data-compra-id="${c.id}" data-month="${mk}" data-calculado="${calculado}"
             value="${formatIntEs(valor)}" placeholder="0" title="${override ? (c.recurrente ? "Editado — se copia a los meses siguientes" : "Editado a mano") : "Calculado automáticamente"}" />
@@ -1125,7 +1150,7 @@ function renderTarjetas() {
             <input type="date" class="compra-edit" data-id="${c.id}" data-field="fecha" value="${c.fecha || ""}" style="border:1px solid var(--paper-line);border-radius:4px;padding:.3rem .35rem;font-size:.92rem;width:140px" />
           </td>
           <td class="amount editable-cell" style="text-align:center">
-            <span class="dollar-prefix">$</span><input type="text" inputmode="numeric" class="compra-edit money-fmt-input" data-id="${c.id}" data-field="montoTotal" value="${formatIntEs(c.montoTotal)}" style="width:100px;text-align:right;border:1px solid var(--paper-line);border-radius:4px;padding:.3rem .4rem;font-family:var(--font-mono);font-size:.95rem;font-weight:700" />
+            <input type="text" inputmode="numeric" class="compra-edit money-fmt-input" data-id="${c.id}" data-field="montoTotal" value="${formatIntEs(c.montoTotal)}" style="width:100px;text-align:right;border:1px solid var(--paper-line);border-radius:4px;padding:.3rem .4rem;font-family:var(--font-mono);font-size:.95rem;font-weight:700" />
           </td>
           <td class="amount" style="text-align:center">${cuotasCell}</td>
           <td class="row-label">
@@ -1167,7 +1192,7 @@ function renderTarjetas() {
               mes(es)
             </span>
             <span style="display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--income);font-weight:600">
-              USD ($):
+              USD:
               <input type="number" min="0" step="0.01" class="cotizacion-input" data-tarjeta-id="${t.id}" value="${cotizacion || ""}" placeholder="0" style="width:80px;text-align:center;border:1px solid var(--income);border-radius:4px;padding:.15rem;font-weight:600;color:var(--income)" />
             </span>
           </div>
@@ -1175,7 +1200,7 @@ function renderTarjetas() {
           <form class="sub-form compra-form" data-tarjeta-id="${t.id}">
             <div class="sf-field sf-desc"><label>Detalle</label><input type="text" class="c-detalle" placeholder="Ej: Heladera" required /></div>
             <div class="sf-field sf-month"><label>Fecha de compra</label><input type="date" class="c-fecha" value="${new Date().toISOString().slice(0, 10)}" required /></div>
-            <div class="sf-field sf-num"><label class="c-total-label">Monto total ($)</label><input type="text" inputmode="numeric" class="c-total money-fmt-input" required /></div>
+            <div class="sf-field sf-num"><label class="c-total-label">Monto total</label><input type="text" inputmode="numeric" class="c-total money-fmt-input" required /></div>
             <div class="sf-field sf-num c-cuotas-field"><label>Cuotas</label><input type="number" class="c-cuotas" min="1" step="1" value="1" required /></div>
             <div class="sf-field sf-month"><label>1ª cuota (nominal, sin vencimiento)</label><input type="month" class="c-mes" value="${currentMonthKey()}" required /></div>
             <div class="sf-field">
@@ -1206,6 +1231,25 @@ function renderTarjetas() {
               </tbody>
             </table>
           </div>
+          ${(() => {
+            const comprasUSD = comprasCard
+              .filter((c) => c.moneda === "USD")
+              .sort((a, b) => (a.fecha || "").localeCompare(b.fecha || ""));
+            if (comprasUSD.length === 0) return "";
+            const filasUSD = comprasUSD.map((c) => {
+              const fechaFmt = c.fecha
+                ? new Date(c.fecha + "T00:00:00").toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" })
+                : "—";
+              return `<div class="usd-breakdown-row"><span>${fechaFmt} — ${escapeHtml(c.detalle)}</span><span>${moneyUSD(c.montoTotal)}</span></div>`;
+            }).join("");
+            const totalUSD = comprasUSD.reduce((s, c) => s + c.montoTotal, 0);
+            return `
+              <div class="usd-breakdown">
+                <div class="usd-breakdown-title">Compras en USD de esta tarjeta</div>
+                ${filasUSD}
+                <div class="usd-breakdown-row usd-breakdown-total"><span>Total USD</span><span>${moneyUSD(totalUSD)}</span></div>
+              </div>`;
+          })()}
         </div>
       </div>`;
   }).join("");
@@ -1579,7 +1623,7 @@ function renderIngresosExtra(months) {
           <div class="ie-detalle-panel">
             <form class="ie-quick-form" data-cat-id="${cat.id}">
               <input type="text" class="ie-detalle" placeholder="Detalle (ej: Luesqtoff store)" />
-              <input type="text" inputmode="numeric" class="ie-monto money-fmt-input" required placeholder="Monto $ (+/-)" />
+              <input type="text" inputmode="numeric" class="ie-monto money-fmt-input" required placeholder="Monto (+/-)" />
               <input type="month" class="ie-mes" value="${currentMonthKey()}" required />
               <button type="submit">+ Agregar</button>
             </form>
@@ -1681,12 +1725,19 @@ document.getElementById("billetera-form").addEventListener("submit", async (e) =
   if (!currentPin) return;
   const detalle = document.getElementById("bw-detalle").value.trim();
   const monto = parseIntEs(document.getElementById("bw-monto").value);
+  const fechaInput = document.getElementById("bw-fecha").value;
   if (!detalle || !monto) return;
 
-  const fecha = new Date().toISOString().slice(0, 10);
-  await addDoc(col("billetera"), { detalle, monto, month: currentMonthKey(), fecha, createdAt: serverTimestamp() });
+  const fecha = fechaInput || new Date().toISOString().slice(0, 10);
+  const month = fecha.slice(0, 7);
+  await addDoc(col("billetera"), { detalle, monto, month, fecha, createdAt: serverTimestamp() });
 
   e.target.reset();
+});
+
+document.getElementById("billetera-mes-filtro").addEventListener("change", (e) => {
+  billeteraMesFiltro = e.target.value;
+  renderBilletera();
 });
 
 document.getElementById("categoria-ingreso-form").addEventListener("submit", async (e) => {
@@ -1732,7 +1783,7 @@ function billeteraTotalForMonth(monthKey) {
 function moneyUSD(n) {
   n = Math.round(n || 0);
   const sign = n < 0 ? "-" : "";
-  return sign + "US$ " + agruparMiles(Math.abs(n));
+  return sign + agruparMiles(Math.abs(n)) + " USD";
 }
 function overrideId(tarjetaId, monthKey) { return `${tarjetaId}_${monthKey}`; }
 function pagoTarjetaOverride(tarjetaId, monthKey) {
@@ -1761,10 +1812,12 @@ function renderGastos() {
   if (!document.getElementById("gn-mes").value) document.getElementById("gn-mes").value = currentMonthKey();
   if (!document.getElementById("in-mes").value) document.getElementById("in-mes").value = currentMonthKey();
 
-  const diaCell = (value, docCollection, docId) => `
+  const diaCell = (dia, mes, docCollection, docId) => `
     <td class="dia-col">
       <div class="dia-box">
-        <input type="number" min="1" max="31" class="dia-input" data-collection="${docCollection}" data-id="${docId}" value="${value || ""}" placeholder="—" />
+        <input type="number" min="1" max="31" class="dia-input" data-collection="${docCollection}" data-id="${docId}" data-parte="dia" value="${dia || ""}" placeholder="día" />
+        <span class="dia-sep">/</span>
+        <input type="number" min="1" max="12" class="dia-input" data-collection="${docCollection}" data-id="${docId}" data-parte="mes" value="${mes || ""}" placeholder="mes" />
       </div>
     </td>`;
 
@@ -1798,7 +1851,7 @@ function renderGastos() {
           value="${formatIntEs(valor)}" placeholder="0" title="${override ? "Editado a mano — distinto al total de cuotas" : "Calculado automáticamente. Cambialo si vas a pagar otro monto."}" />
       </td>`;
     }).join("");
-    rows.push(`<tr><td class="row-label">${escapeHtml(t.nombre)}</td>${cells}${diaCell(t.diaVencimiento, "tarjetas", t.id)}</tr>`);
+    rows.push(`<tr><td class="row-label">${escapeHtml(t.nombre)}</td>${cells}${diaCell(t.diaVencimiento, t.mesVencimiento, "tarjetas", t.id)}</tr>`);
   });
 
   rows.push(`<tr class="section-row"><td class="row-label">Impuestos</td>${months.map(() => "<td></td>").join("")}<td></td></tr>`);
@@ -1808,7 +1861,7 @@ function renderGastos() {
       const monto = entry ? entry.monto || 0 : 0;
       return `<td class="amount editable-cell"><input type="text" inputmode="numeric" class="gasto-monto-input money-fmt-input" data-cat="${c.id}" data-month="${mk}" value="${formatIntEs(monto)}" placeholder="0" /></td>`;
     }).join("");
-    rows.push(`<tr><td class="row-label">${escapeHtml(c.nombre)} <button class="row-inline-delete" data-collection="categoriasImpuesto" data-id="${c.id}" title="Eliminar impuesto">×</button></td>${cells}${diaCell(c.diaVencimiento, "categoriasImpuesto", c.id)}</tr>`);
+    rows.push(`<tr><td class="row-label">${escapeHtml(c.nombre)} <button class="row-inline-delete" data-collection="categoriasImpuesto" data-id="${c.id}" title="Eliminar impuesto">×</button></td>${cells}${diaCell(c.diaVencimiento, c.mesVencimiento, "categoriasImpuesto", c.id)}</tr>`);
   });
 
   rows.push(`<tr class="section-row"><td class="row-label">Gastos Fijos</td>${months.map(() => "<td></td>").join("")}<td></td></tr>`);
@@ -1818,7 +1871,7 @@ function renderGastos() {
       const monto = entry ? entry.monto || 0 : 0;
       return `<td class="amount editable-cell"><input type="text" inputmode="numeric" class="gasto-monto-input money-fmt-input" data-cat="${c.id}" data-month="${mk}" value="${formatIntEs(monto)}" placeholder="0" /></td>`;
     }).join("");
-    rows.push(`<tr><td class="row-label">${escapeHtml(c.nombre)} <button class="row-inline-delete" data-collection="categoriasGasto" data-id="${c.id}" title="Eliminar categoría">×</button></td>${cells}${diaCell(c.diaVencimiento, "categoriasGasto", c.id)}</tr>`);
+    rows.push(`<tr><td class="row-label">${escapeHtml(c.nombre)} <button class="row-inline-delete" data-collection="categoriasGasto" data-id="${c.id}" title="Eliminar categoría">×</button></td>${cells}${diaCell(c.diaVencimiento, c.mesVencimiento, "categoriasGasto", c.id)}</tr>`);
   });
 
   const billeteraCells = months.map((mk) => {
@@ -1866,34 +1919,57 @@ function renderGastos() {
 
   document.querySelectorAll(".dia-input").forEach((input) => {
     input.addEventListener("change", async () => {
-      const dia = parseInt(input.value, 10);
-      const field = input.dataset.collection === "empresas" ? "diaCobro" : "diaVencimiento";
-      await updateDoc(doc(db, "pins", currentPin, input.dataset.collection, input.dataset.id), { [field]: isNaN(dia) ? null : dia });
+      const valor = parseInt(input.value, 10);
+      const esParteMes = input.dataset.parte === "mes";
+      const field = esParteMes
+        ? (input.dataset.collection === "empresas" ? "mesCobro" : "mesVencimiento")
+        : (input.dataset.collection === "empresas" ? "diaCobro" : "diaVencimiento");
+      await updateDoc(doc(db, "pins", currentPin, input.dataset.collection, input.dataset.id), { [field]: isNaN(valor) ? null : valor });
     });
   });
 
   renderBilletera();
 }
 
+let billeteraMesFiltro = null; // null = usar mes actual por defecto
+
 function renderBilletera() {
   const table = document.getElementById("billetera-table");
-  if (billetera.length === 0) {
-    table.innerHTML = `<tbody><tr><td class="empty-state">Todavía no cargaste nada en la billetera este mes.</td></tr></tbody>`;
-    return;
-  }
-  const thead = `<tr><th>Fecha</th><th>Detalle</th><th>Monto</th><th></th></tr>`;
-  const rows = billetera.map((b) => {
-    const fechaFmt = b.fecha
-      ? new Date(b.fecha + "T00:00:00").toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" })
-      : "—";
-    return `<tr>
-      <td class="amount muted">${fechaFmt}</td>
+  const filtroSelect = document.getElementById("billetera-mes-filtro");
+
+  // Popular el selector de mes con los meses que tienen datos + el actual
+  const cur = currentMonthKey();
+  const mesesConDatos = [...new Set(billetera.map((b) => b.month))];
+  if (!mesesConDatos.includes(cur)) mesesConDatos.push(cur);
+  mesesConDatos.sort().reverse();
+
+  const mesActivo = billeteraMesFiltro || cur;
+  filtroSelect.innerHTML = mesesConDatos.map((mk) =>
+    `<option value="${mk}" ${mk === mesActivo ? "selected" : ""}>${formatMonthShort(mk).replace(/^\w/, (c) => c.toUpperCase())}</option>`
+  ).join("");
+
+  const entradasDelMes = billetera.filter((b) => b.month === mesActivo);
+
+  if (entradasDelMes.length === 0) {
+    table.innerHTML = `<tbody><tr><td class="empty-state">Sin gastos cargados en ${formatMonthShort(mesActivo)}.</td></tr></tbody>`;
+  } else {
+    const thead = `<tr><th>Fecha</th><th>Detalle</th><th>Monto</th><th></th></tr>`;
+    const rows = entradasDelMes.map((b) => `<tr>
+      <td class="amount"><input type="date" class="billetera-fecha-edit" data-id="${b.id}" value="${b.fecha || ""}" style="border:1px solid var(--paper-line);border-radius:4px;padding:.25rem .3rem;font-size:.85rem;width:130px" /></td>
       <td class="row-label">${escapeHtml(b.detalle)}</td>
       <td class="amount">${money(b.monto)}</td>
       <td class="row-delete"><button data-collection="billetera" data-id="${b.id}" aria-label="Eliminar">×</button></td>
-    </tr>`;
-  }).join("");
-  table.innerHTML = `<thead>${thead}</thead><tbody>${rows}</tbody>`;
+    </tr>`).join("");
+    table.innerHTML = `<thead>${thead}</thead><tbody>${rows}</tbody>`;
+  }
+
+  table.querySelectorAll(".billetera-fecha-edit").forEach((input) => {
+    input.addEventListener("change", async () => {
+      if (!currentPin || !input.value) return;
+      const nuevoMes = input.value.slice(0, 7);
+      await updateDoc(doc(db, "pins", currentPin, "billetera", input.dataset.id), { fecha: input.value, month: nuevoMes });
+    });
+  });
 }
 
 /* ---------- Formateo en vivo de todos los campos de monto (puntos de miles) ---------- */
