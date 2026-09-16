@@ -306,43 +306,55 @@ input, select { font-family: var(--font-body); }
   cursor: pointer;
 }
 
-.cotizacion-box {
-  display: flex;
+.filtro-chip {
+  display: inline-flex;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  background: var(--income-soft);
-  border: 1.5px solid var(--income);
-  border-radius: 10px;
-  padding: .8rem 1rem;
-  margin-bottom: 1rem;
+  gap: .35rem;
+  font-size: .76rem;
+  color: var(--muted);
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: 20px;
+  padding: .35rem .7rem;
 }
-.cotizacion-box-label {
-  font-size: .88rem;
-  font-weight: 700;
-  color: var(--income);
-  white-space: nowrap;
-}
-.cotizacion-box-input-wrap {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  flex-wrap: wrap;
-}
-.cotizacion-input {
-  width: 110px;
-  padding: .5rem .6rem;
-  border: 1.5px solid var(--income);
-  border-radius: 8px;
-  background: var(--white);
-  color: var(--income);
-  font-weight: 700;
-  font-size: 1.05rem;
-  font-family: var(--font-mono);
+.filtro-chip input {
+  width: 44px;
   text-align: center;
+  border: 1px solid var(--paper-line);
+  border-radius: 4px;
+  padding: .15rem;
+  font-size: .8rem;
+  background: var(--white);
 }
-.cotizacion-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(47,107,79,.2); }
-.cotizacion-box-hint { font-size: .74rem; color: var(--income); opacity: .85; }
+.filtro-chip-usd {
+  color: var(--income);
+  background: var(--income-soft);
+  border-color: var(--income);
+  font-weight: 600;
+}
+.filtro-chip-usd input {
+  width: 68px;
+  border-color: var(--income);
+  color: var(--income);
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+.filtro-chip-usd input:focus { outline: none; box-shadow: 0 0 0 2px rgba(47,107,79,.2); }
+
+.pagado-frame {
+  display: inline-flex;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 3px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.pagado-frame:hover { border-color: var(--paper-line); }
+.pagado-frame.pagado-si {
+  border-color: var(--income);
+  background: var(--income-soft);
+}
+.pagado-frame.pagado-si .gasto-monto-input { color: var(--income); }
 
 .matrix-table td.muted { color: var(--muted); }
 .matrix-table td.row-delete { text-align: center; width: 32px; }
@@ -1138,7 +1150,6 @@ function renderTarjetas() {
           : cuotaMontoForMonth(c, mk);
         const valor = cuotaMontoEfectivo(c, mk);
         return `<td class="amount editable-cell">
-          ${esUSD ? '<span style="font-size:.68rem;color:var(--income);font-weight:700">USD</span>' : ""}
           <input type="text" inputmode="numeric" class="cuota-input money-fmt-input ${override ? "edited" : ""} ${esUSD ? "cuota-usd" : ""}"
             data-compra-id="${c.id}" data-month="${mk}" data-calculado="${calculado}"
             value="${formatIntEs(valor)}" placeholder="0" title="${override ? (c.recurrente ? "Editado — se copia a los meses siguientes" : "Editado a mano") : "Calculado automáticamente"}" />
@@ -1162,12 +1173,6 @@ function renderTarjetas() {
           <td class="row-label">
             <input type="text" class="compra-edit" data-id="${c.id}" data-field="detalle" value="${escapeHtml(c.detalle)}" style="width:100%;border:none;background:transparent;font-weight:600;font-family:inherit;font-size:.95rem;padding:.15rem 0;color:var(--ink)" />
           </td>
-          <td class="amount" style="text-align:center">
-            <select class="compra-edit compra-moneda-select" data-id="${c.id}" data-field="moneda" style="font-size:.82rem;border:1px solid var(--paper-line);border-radius:4px;padding:.2rem .3rem;color:${esUSD ? "var(--income)" : "var(--ink)"};font-weight:${esUSD ? "700" : "400"}">
-              <option value="ARS" ${!esUSD ? "selected" : ""}>Pesos</option>
-              <option value="USD" ${esUSD ? "selected" : ""}>USD</option>
-            </select>
-          </td>
           ${cells}
           <td class="row-delete"><button data-collection="compras" data-id="${c.id}" aria-label="Eliminar">×</button></td>
         </tr>`;
@@ -1180,7 +1185,7 @@ function renderTarjetas() {
 
     const totalCells = months.map((mk) => `<td class="amount">${money(tarjetaTotalForMonth(t.id, mk))}</td>`).join("");
 
-    const thead = `<tr><th>Fecha</th><th>Total</th><th>Cuotas</th><th>Detalle</th><th>Tipo</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}<th></th></tr>`;
+    const thead = `<tr><th>Fecha</th><th>Total</th><th>Cuotas</th><th>Detalle</th>${months.map((mk) => `<th>${formatMonthShort(mk)}</th>`).join("")}<th></th></tr>`;
 
     const cotizacion = tarjetaCotizacion(t.id);
 
@@ -1191,18 +1196,16 @@ function renderTarjetas() {
           <button class="group-delete" data-collection="tarjetas" data-id="${t.id}">Eliminar tarjeta</button>
         </div>
         <div class="group-body">
-          <div style="margin-bottom:.7rem;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">
-            <span style="font-size:.76rem;color:var(--muted)">Vencimiento: cuota +</span>
-            <input type="number" min="0" step="1" class="vencimiento-offset-input" data-tarjeta-id="${t.id}" value="${tarjetaVencimientoOffset(t.id)}" style="width:40px;text-align:center;border:1px solid var(--paper-line);border-radius:4px;padding:.15rem" />
-            <span style="font-size:.76rem;color:var(--muted)">mes(es)</span>
-          </div>
-
-          <div class="cotizacion-box">
-            <span class="cotizacion-box-label">💵 Cotización del dólar para esta tarjeta</span>
-            <div class="cotizacion-box-input-wrap">
-              <input type="number" min="0" step="0.01" class="cotizacion-input" data-tarjeta-id="${t.id}" value="${cotizacion || ""}" placeholder="Ej: 1450" />
-              <span class="cotizacion-box-hint">pesos por 1 USD — así se convierten y suman las compras en USD al Total tarjeta</span>
-            </div>
+          <div style="margin-bottom:.7rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
+            <span class="filtro-chip">
+              Vencimiento: cuota +
+              <input type="number" min="0" step="1" class="vencimiento-offset-input" data-tarjeta-id="${t.id}" value="${tarjetaVencimientoOffset(t.id)}" />
+              mes(es)
+            </span>
+            <span class="filtro-chip filtro-chip-usd" title="Pesos por 1 USD — así se suman las compras en USD al Total tarjeta">
+              💵 Cotización USD
+              <input type="number" min="0" step="0.01" class="cotizacion-input" data-tarjeta-id="${t.id}" value="${cotizacion || ""}" placeholder="0" />
+            </span>
           </div>
 
           <form class="sub-form compra-form" data-tarjeta-id="${t.id}">
@@ -1233,9 +1236,9 @@ function renderTarjetas() {
             <table class="matrix-table">
               <thead>${thead}</thead>
               <tbody>
-                ${rows || `<tr><td colspan="${months.length + 6}" class="empty-state">Sin compras cargadas.</td></tr>`}
-                <tr><td></td><td></td><td></td><td class="row-label">Comisión</td><td></td>${comisionCells}<td></td></tr>
-                <tr class="total-row"><td></td><td></td><td></td><td class="row-label">Total tarjeta</td><td></td>${totalCells}<td></td></tr>
+                ${rows || `<tr><td colspan="${months.length + 5}" class="empty-state">Sin compras cargadas.</td></tr>`}
+                <tr><td></td><td></td><td></td><td class="row-label">Comisión</td>${comisionCells}<td></td></tr>
+                <tr class="total-row"><td></td><td></td><td></td><td class="row-label">Total tarjeta</td>${totalCells}<td></td></tr>
               </tbody>
             </table>
           </div>
@@ -1848,7 +1851,12 @@ function renderGastos() {
     const cells = months.map((mk) => {
       const entry = gastoEntryFor(c.id, mk, "ARS");
       const monto = entry ? entry.monto || 0 : 0;
-      return `<td class="amount editable-cell"><input type="text" inputmode="numeric" class="gasto-monto-input money-fmt-input" data-cat="${c.id}" data-month="${mk}" value="${formatIntEs(monto)}" placeholder="0" /></td>`;
+      const pagado = entry ? !!entry.pagado : false;
+      return `<td class="amount editable-cell">
+        <div class="pagado-frame ${pagado ? "pagado-si" : ""}" data-cat="${c.id}" data-month="${mk}" data-moneda="ARS" title="Tocá el marco para marcar pagado">
+          <input type="text" inputmode="numeric" class="gasto-monto-input money-fmt-input" data-cat="${c.id}" data-month="${mk}" value="${formatIntEs(monto)}" placeholder="0" />
+        </div>
+      </td>`;
     }).join("");
     rows.push(`<tr><td class="row-label">${escapeHtml(c.nombre)} <button class="row-inline-delete" data-collection="categoriasImpuesto" data-id="${c.id}" title="Eliminar impuesto">×</button></td>${cells}${diaCell(c.diaVencimiento, c.mesVencimiento, "categoriasImpuesto", c.id)}</tr>`);
   });
@@ -1858,7 +1866,12 @@ function renderGastos() {
     const cells = months.map((mk) => {
       const entry = gastoEntryFor(c.id, mk, "ARS");
       const monto = entry ? entry.monto || 0 : 0;
-      return `<td class="amount editable-cell"><input type="text" inputmode="numeric" class="gasto-monto-input money-fmt-input" data-cat="${c.id}" data-month="${mk}" value="${formatIntEs(monto)}" placeholder="0" /></td>`;
+      const pagado = entry ? !!entry.pagado : false;
+      return `<td class="amount editable-cell">
+        <div class="pagado-frame ${pagado ? "pagado-si" : ""}" data-cat="${c.id}" data-month="${mk}" data-moneda="ARS" title="Tocá el marco para marcar pagado">
+          <input type="text" inputmode="numeric" class="gasto-monto-input money-fmt-input" data-cat="${c.id}" data-month="${mk}" value="${formatIntEs(monto)}" placeholder="0" />
+        </div>
+      </td>`;
     }).join("");
     rows.push(`<tr><td class="row-label">${escapeHtml(c.nombre)} <button class="row-inline-delete" data-collection="categoriasGasto" data-id="${c.id}" title="Eliminar categoría">×</button></td>${cells}${diaCell(c.diaVencimiento, c.mesVencimiento, "categoriasGasto", c.id)}</tr>`);
   });
@@ -1903,6 +1916,15 @@ function renderGastos() {
     input.addEventListener("change", async () => {
       const monto = parseIntEs(input.value);
       await guardarGastoCelda(input.dataset.cat, input.dataset.month, "ARS", { monto });
+    });
+  });
+
+  document.querySelectorAll(".pagado-frame").forEach((frame) => {
+    frame.addEventListener("click", async (e) => {
+      if (e.target.tagName === "INPUT") return; // dejar que el clic en el número entre a editar, sin togglear
+      if (!currentPin) return;
+      const yaPagado = frame.classList.contains("pagado-si");
+      await guardarGastoCelda(frame.dataset.cat, frame.dataset.month, frame.dataset.moneda, { pagado: !yaPagado });
     });
   });
 
