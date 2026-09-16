@@ -286,66 +286,64 @@ input, select { font-family: var(--font-body); }
   background: var(--white) !important;
   padding: .5rem .6rem;
 }
-.dia-box {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  width: 92px;
-  height: 44px;
+.dia-input[type="date"] {
+  width: 130px;
+  padding: .55rem .6rem;
   border-radius: 10px;
   background: linear-gradient(160deg, var(--white), var(--paper));
-  border: 1px solid var(--gold);
+  border: 1.5px solid var(--gold);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 2px 5px rgba(28,37,65,.15);
-}
-.dia-sep { color: var(--gold); font-weight: 700; font-size: .95rem; }
-
-.usd-breakdown {
-  margin: .7rem 1rem 0;
-  padding: .8rem 1rem;
-  background: var(--income-soft);
-  border: 1px solid var(--income);
-  border-radius: 8px;
-}
-.usd-breakdown-title {
-  font-size: .72rem;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  font-weight: 700;
-  color: var(--income);
-  margin-bottom: .5rem;
-}
-.usd-breakdown-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: .3rem 0;
-  color: var(--income);
+  font-family: var(--font-body);
+  font-size: .92rem;
   font-weight: 600;
-  font-size: .85rem;
-  border-bottom: 1px solid rgba(47,107,79,.15);
+  color: var(--ink);
+  cursor: pointer;
 }
-.usd-breakdown-row:last-of-type { border-bottom: none; }
-.usd-breakdown-total {
-  margin-top: .3rem;
-  padding-top: .5rem;
-  border-top: 2px solid var(--income);
-  font-weight: 800;
-  font-size: .95rem;
+.dia-input[type="date"]:hover { border-color: #a3762f; }
+.dia-input[type="date"]:focus { outline: none; box-shadow: 0 0 0 3px var(--gold-soft); }
+.dia-input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: sepia(1) saturate(4) hue-rotate(2deg);
+  cursor: pointer;
 }
-.dia-input {
-  width: 38px;
-  height: 100%;
-  border: none;
-  background: transparent;
-  text-align: center;
-  font-family: var(--font-mono);
-  font-size: 1rem;
+
+.cotizacion-box {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  background: var(--income-soft);
+  border: 1.5px solid var(--income);
+  border-radius: 10px;
+  padding: .8rem 1rem;
+  margin-bottom: 1rem;
+}
+.cotizacion-box-label {
+  font-size: .88rem;
   font-weight: 700;
-  color: var(--gold);
+  color: var(--income);
+  white-space: nowrap;
 }
-.dia-input:focus { outline: none; }
-.dia-input::placeholder { color: var(--paper-line); font-weight: 400; font-size: .68rem; }
+.cotizacion-box-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+}
+.cotizacion-input {
+  width: 110px;
+  padding: .5rem .6rem;
+  border: 1.5px solid var(--income);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--income);
+  font-weight: 700;
+  font-size: 1.05rem;
+  font-family: var(--font-mono);
+  text-align: center;
+}
+.cotizacion-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(47,107,79,.2); }
+.cotizacion-box-hint { font-size: .74rem; color: var(--income); opacity: .85; }
+
 .matrix-table td.muted { color: var(--muted); }
 .matrix-table td.row-delete { text-align: center; width: 32px; }
 .matrix-table td.row-delete button { background: none; border: none; color: var(--paper-line); font-size: 1rem; }
@@ -1120,7 +1118,12 @@ function renderTarjetas() {
   container.innerHTML = tarjetas.map((t) => {
     const comprasCard = compras
       .filter((c) => c.tarjetaId === t.id)
-      .sort((a, b) => (a.fecha || "").localeCompare(b.fecha || ""));
+      .sort((a, b) => {
+        const aUSD = a.moneda === "USD" ? 1 : 0;
+        const bUSD = b.moneda === "USD" ? 1 : 0;
+        if (aUSD !== bUSD) return aUSD - bUSD; // pesos primero, USD al final
+        return (a.fecha || "").localeCompare(b.fecha || "");
+      });
 
     const rows = comprasCard.map((c) => {
       const esUSD = c.moneda === "USD";
@@ -1150,7 +1153,10 @@ function renderTarjetas() {
             <input type="date" class="compra-edit" data-id="${c.id}" data-field="fecha" value="${c.fecha || ""}" style="border:1px solid var(--paper-line);border-radius:4px;padding:.3rem .35rem;font-size:.92rem;width:140px" />
           </td>
           <td class="amount editable-cell" style="text-align:center">
-            <input type="text" inputmode="numeric" class="compra-edit money-fmt-input" data-id="${c.id}" data-field="montoTotal" value="${formatIntEs(c.montoTotal)}" style="width:100px;text-align:right;border:1px solid var(--paper-line);border-radius:4px;padding:.3rem .4rem;font-family:var(--font-mono);font-size:.95rem;font-weight:700" />
+            ${esUSD
+              ? `<span class="muted" style="font-size:.85rem">—</span>`
+              : `<input type="text" inputmode="numeric" class="compra-edit money-fmt-input" data-id="${c.id}" data-field="montoTotal" value="${formatIntEs(c.montoTotal)}" style="width:100px;text-align:right;border:1px solid var(--paper-line);border-radius:4px;padding:.3rem .4rem;font-family:var(--font-mono);font-size:.95rem;font-weight:700" />`
+            }
           </td>
           <td class="amount" style="text-align:center">${cuotasCell}</td>
           <td class="row-label">
@@ -1185,16 +1191,18 @@ function renderTarjetas() {
           <button class="group-delete" data-collection="tarjetas" data-id="${t.id}">Eliminar tarjeta</button>
         </div>
         <div class="group-body">
-          <div style="margin-bottom:.7rem;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap">
-            <span style="display:inline-flex;align-items:center;gap:.35rem;font-size:.76rem;color:var(--muted)">
-              Vencimiento: cuota +
-              <input type="number" min="0" step="1" class="vencimiento-offset-input" data-tarjeta-id="${t.id}" value="${tarjetaVencimientoOffset(t.id)}" style="width:40px;text-align:center;border:1px solid var(--paper-line);border-radius:4px;padding:.15rem" />
-              mes(es)
-            </span>
-            <span style="display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--income);font-weight:600">
-              USD:
-              <input type="number" min="0" step="0.01" class="cotizacion-input" data-tarjeta-id="${t.id}" value="${cotizacion || ""}" placeholder="0" style="width:80px;text-align:center;border:1px solid var(--income);border-radius:4px;padding:.15rem;font-weight:600;color:var(--income)" />
-            </span>
+          <div style="margin-bottom:.7rem;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">
+            <span style="font-size:.76rem;color:var(--muted)">Vencimiento: cuota +</span>
+            <input type="number" min="0" step="1" class="vencimiento-offset-input" data-tarjeta-id="${t.id}" value="${tarjetaVencimientoOffset(t.id)}" style="width:40px;text-align:center;border:1px solid var(--paper-line);border-radius:4px;padding:.15rem" />
+            <span style="font-size:.76rem;color:var(--muted)">mes(es)</span>
+          </div>
+
+          <div class="cotizacion-box">
+            <span class="cotizacion-box-label">💵 Cotización del dólar para esta tarjeta</span>
+            <div class="cotizacion-box-input-wrap">
+              <input type="number" min="0" step="0.01" class="cotizacion-input" data-tarjeta-id="${t.id}" value="${cotizacion || ""}" placeholder="Ej: 1450" />
+              <span class="cotizacion-box-hint">pesos por 1 USD — así se convierten y suman las compras en USD al Total tarjeta</span>
+            </div>
           </div>
 
           <form class="sub-form compra-form" data-tarjeta-id="${t.id}">
@@ -1231,25 +1239,6 @@ function renderTarjetas() {
               </tbody>
             </table>
           </div>
-          ${(() => {
-            const comprasUSD = comprasCard
-              .filter((c) => c.moneda === "USD")
-              .sort((a, b) => (a.fecha || "").localeCompare(b.fecha || ""));
-            if (comprasUSD.length === 0) return "";
-            const filasUSD = comprasUSD.map((c) => {
-              const fechaFmt = c.fecha
-                ? new Date(c.fecha + "T00:00:00").toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" })
-                : "—";
-              return `<div class="usd-breakdown-row"><span>${fechaFmt} — ${escapeHtml(c.detalle)}</span><span>${moneyUSD(c.montoTotal)}</span></div>`;
-            }).join("");
-            const totalUSD = comprasUSD.reduce((s, c) => s + c.montoTotal, 0);
-            return `
-              <div class="usd-breakdown">
-                <div class="usd-breakdown-title">Compras en USD de esta tarjeta</div>
-                ${filasUSD}
-                <div class="usd-breakdown-row usd-breakdown-total"><span>Total USD</span><span>${moneyUSD(totalUSD)}</span></div>
-              </div>`;
-          })()}
         </div>
       </div>`;
   }).join("");
@@ -1812,14 +1801,14 @@ function renderGastos() {
   if (!document.getElementById("gn-mes").value) document.getElementById("gn-mes").value = currentMonthKey();
   if (!document.getElementById("in-mes").value) document.getElementById("in-mes").value = currentMonthKey();
 
-  const diaCell = (dia, mes, docCollection, docId) => `
+  const diaCell = (dia, mes, docCollection, docId) => {
+    // El input date necesita un año para mostrar algo válido; usamos uno fijo, solo importan día y mes
+    const fechaValor = dia && mes ? `2026-${String(mes).padStart(2, "0")}-${String(dia).padStart(2, "0")}` : "";
+    return `
     <td class="dia-col">
-      <div class="dia-box">
-        <input type="number" min="1" max="31" class="dia-input" data-collection="${docCollection}" data-id="${docId}" data-parte="dia" value="${dia || ""}" placeholder="día" />
-        <span class="dia-sep">/</span>
-        <input type="number" min="1" max="12" class="dia-input" data-collection="${docCollection}" data-id="${docId}" data-parte="mes" value="${mes || ""}" placeholder="mes" />
-      </div>
+      <input type="date" class="dia-input" data-collection="${docCollection}" data-id="${docId}" value="${fechaValor}" />
     </td>`;
+  };
 
   rows.push(`<tr class="section-row"><td class="row-label">Ingresos</td>${months.map(() => "<td></td>").join("")}<td></td></tr>`);
   const sueldoVirCells = months.map((mk) => {
@@ -1919,12 +1908,18 @@ function renderGastos() {
 
   document.querySelectorAll(".dia-input").forEach((input) => {
     input.addEventListener("change", async () => {
-      const valor = parseInt(input.value, 10);
-      const esParteMes = input.dataset.parte === "mes";
-      const field = esParteMes
-        ? (input.dataset.collection === "empresas" ? "mesCobro" : "mesVencimiento")
-        : (input.dataset.collection === "empresas" ? "diaCobro" : "diaVencimiento");
-      await updateDoc(doc(db, "pins", currentPin, input.dataset.collection, input.dataset.id), { [field]: isNaN(valor) ? null : valor });
+      if (!currentPin) return;
+      const campoDia = input.dataset.collection === "empresas" ? "diaCobro" : "diaVencimiento";
+      const campoMes = input.dataset.collection === "empresas" ? "mesCobro" : "mesVencimiento";
+      if (!input.value) {
+        await updateDoc(doc(db, "pins", currentPin, input.dataset.collection, input.dataset.id), { [campoDia]: null, [campoMes]: null });
+        return;
+      }
+      const [, mm, dd] = input.value.split("-");
+      await updateDoc(doc(db, "pins", currentPin, input.dataset.collection, input.dataset.id), {
+        [campoDia]: parseInt(dd, 10),
+        [campoMes]: parseInt(mm, 10)
+      });
     });
   });
 
